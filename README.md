@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # C and Embedded C notes (static site)
 
 Your four Word documents as a fast, searchable reading site. No server code needed.
@@ -21,3 +22,6 @@ Commit and push. This regenerates everything in `public/content`.
 ## Features
 Search across all four documents (press / to focus), contents list that follows your position, C syntax colours with Copy buttons,
 light and dark mode, remembers your last document and scroll position, mobile friendly, link to download each original .docx.
+=======
+# c-motes
+>>>>>>> 6726fc826845aca40e46ab3014f18860b7ae85a5

@@ -1,0 +1,266 @@
+<header class="doc-head"><p class="title">C and Embedded C</p><p class="subtitle">Complete Study Plan with Daily Calendar</p><p class="meta">30 October 2026 to 30 November 2026</p></header><h1 id="1-how-this-plan-works">1. How this plan works</h1>
+<p>The plan has 4 parts: the C language (2 weeks), Embedded C fundamentals (1 week), Embedded C on real hardware (1 week), and interview preparation (last days and December).</p>
+<p><strong>Golden rule: for every 1 hour of theory, spend 2 hours writing code. You learn programming with your hands, not by watching videos.</strong></p>
+<h2 id="daily-routine-college-days">Daily routine (college days)</h2>
+<div class="tablewrap"><table>
+<tr><th><strong>Time</strong></th><th><strong>What to do</strong></th></tr>
+<tr><td>Commute (bus)</td><td>Theory only: watch or read that day's topic. Note the 3 key points on your phone.</td></tr>
+<tr><td>10 am to 4 pm</td><td>College / course.</td></tr>
+<tr><td>6:30 to 7:30 pm</td><td>Reach home, freshen up, dinner, rest.</td></tr>
+<tr><td>7:30 to 9:30 pm</td><td>Practice: write code for that day's topic. Run it, break it, fix it.</td></tr>
+<tr><td>9:30 to 9:45 pm</td><td>Write 3 lines in a notebook: what I learned, what confused me, what I do tomorrow.</td></tr>
+</table></div>
+<h2 id="weekend-routine">Weekend routine</h2>
+<div class="tablewrap"><table>
+<tr><th><strong>Day</strong></th><th><strong>What to do</strong></th></tr>
+<tr><td>Saturday (4 hrs)</td><td>Finish the weekly mini-project. Push the code to GitHub with a README.</td></tr>
+<tr><td>Sunday (3 hrs)</td><td>Revise the week, then solve 10 interview questions out loud. Keep the evening free to rest.</td></tr>
+</table></div>
+<h1 id="2-weekly-overview">2. Weekly overview</h1>
+<div class="tablewrap"><table>
+<tr><th><strong>Week</strong></th><th><strong>Dates</strong></th><th><strong>Focus and weekend project</strong></th></tr>
+<tr><td>Start</td><td>30 Oct to 1 Nov</td><td>C basics: data types, operators, control flow, loops</td></tr>
+<tr><td>Week 1</td><td>2 to 8 Nov</td><td>Functions, recursion, arrays, strings. Project 1: Contact book</td></tr>
+<tr><td>Week 2</td><td>9 to 15 Nov</td><td>Pointers, structs, dynamic memory, preprocessor, files. Project 2: Student record manager</td></tr>
+<tr><td>Week 3</td><td>16 to 22 Nov</td><td>Embedded C fundamentals: bits, volatile, memory, registers. Project 3: Bit manipulation library</td></tr>
+<tr><td>Week 4</td><td>23 to 29 Nov</td><td>GPIO, interrupts, timers, ADC, UART, I2C, SPI. Project 4: Ring buffer and state machine</td></tr>
+<tr><td>Final</td><td>30 Nov</td><td>Mock interview, GitHub cleanup, resume update</td></tr>
+</table></div>
+<h1 id="3-part-a-c-language-topics-in-detail">3. Part A: C language topics in detail</h1>
+<h2 id="1-basics-and-data-types">1. Basics and data types</h2>
+<ul>
+<li>Compile and run cycle (source, compiler, executable)</li>
+<li>int, char, float, double, sizeof</li>
+<li>Variables, constants, type casting</li>
+<li>printf / scanf and format specifiers</li>
+</ul>
+<p><strong>Practice: </strong>Print the size of every data type and add two numbers typed by the user.</p>
+<h2 id="2-operators-and-control-flow">2. Operators and control flow</h2>
+<ul>
+<li>Arithmetic, relational, logical, ternary operators; precedence</li>
+<li>if / else if / else, switch</li>
+<li>for, while, do-while, break, continue</li>
+</ul>
+<p><strong>Practice: </strong>Calculator using switch; leap year; prime check; pyramid patterns.</p>
+<h2 id="3-functions-and-recursion">3. Functions and recursion</h2>
+<ul>
+<li>Declaration, definition, call</li>
+<li>Call by value and return values</li>
+<li>Recursion and how the stack grows</li>
+<li>Header files (split code into .c and .h)</li>
+</ul>
+<p><strong>Practice: </strong>Factorial, Fibonacci, GCD, power, sum of digits using recursion.</p>
+<h2 id="4-arrays-and-strings">4. Arrays and strings</h2>
+<ul>
+<li>1D and 2D arrays</li>
+<li>Strings as char arrays ending in '\0'</li>
+<li>string.h: strlen, strcpy, strcmp, strcat</li>
+<li>Searching and sorting basics</li>
+</ul>
+<p><strong>Practice: </strong>Write your own strlen, strcpy, strcmp; reverse a string; palindrome; matrix addition.</p>
+<h2 id="5-pointers-most-important">5. Pointers (most important)</h2>
+<ul>
+<li>Address-of (&amp;) and dereference (*)</li>
+<li>Pointer arithmetic; arrays and pointers are closely related</li>
+<li>Pointer to pointer, void pointer, NULL pointer</li>
+<li>Dangling and wild pointers</li>
+<li>Function pointers and callbacks</li>
+</ul>
+<p><strong>Practice: </strong>Swap two numbers using pointers; traverse an array using only pointers; call a function through a function pointer.</p>
+<h2 id="6-structures-unions-enums-typedef">6. Structures, unions, enums, typedef</h2>
+<ul>
+<li>struct definition and arrays of structs</li>
+<li>union: members share the same memory</li>
+<li>enum for named constants</li>
+<li>typedef to shorten type names</li>
+<li>Bit-fields</li>
+</ul>
+<p><strong>Practice: </strong>Student record array; print sizeof a struct and a union and explain the difference.</p>
+<h2 id="7-dynamic-memory">7. Dynamic memory</h2>
+<ul>
+<li>malloc, calloc, realloc, free</li>
+<li>Memory leaks and double free</li>
+<li>Stack vs heap</li>
+<li>Linked list basics</li>
+</ul>
+<p><strong>Practice: </strong>Create an array with malloc, grow it with realloc, free it; build a singly linked list (insert, delete, reverse).</p>
+<h2 id="8-storage-classes-and-preprocessor">8. Storage classes and preprocessor</h2>
+<ul>
+<li>auto, register, static, extern</li>
+<li>static variable inside a function keeps its value</li>
+<li>#define, macros with arguments, #ifdef, #ifndef</li>
+<li>Include guards</li>
+</ul>
+<p><strong>Practice: </strong>Static counter function; MAX/MIN macros; a project split into 3 files with a header and include guard.</p>
+<h2 id="9-file-handling">9. File handling</h2>
+<ul>
+<li>fopen, fclose, modes (r, w, a)</li>
+<li>fprintf, fscanf, fgets, fputs</li>
+<li>fread and fwrite for binary data</li>
+</ul>
+<p><strong>Practice: </strong>Save and load student records to a file.</p>
+<h1 id="4-part-b-embedded-c-topics-in-detail">4. Part B: Embedded C topics in detail</h1>
+<h2 id="10-bitwise-operators-and-bit-manipulation">10. Bitwise operators and bit manipulation</h2>
+<ul>
+<li>&amp;, |, ^, ~, &lt;&lt;, &gt;&gt;</li>
+<li>Set, clear, toggle and check a bit using masks</li>
+<li>Count set bits, check power of 2, swap nibbles, reverse bits</li>
+<li>Why embedded code uses bit operations on registers</li>
+</ul>
+<p><strong>Practice: </strong>Write macros SET_BIT, CLEAR_BIT, TOGGLE_BIT, CHECK_BIT and test them.</p>
+<h2 id="11-qualifiers-and-fixed-width-types">11. Qualifiers and fixed-width types</h2>
+<ul>
+<li>volatile: tells the compiler a value can change outside the code (hardware, ISR)</li>
+<li>const and const volatile (read-only status register)</li>
+<li>static for file-private variables</li>
+<li>uint8_t, uint16_t, uint32_t from stdint.h</li>
+</ul>
+<p><strong>Practice: </strong>Explain in your own words why a flag changed in an ISR must be volatile.</p>
+<h2 id="12-memory-layout-startup-and-padding">12. Memory layout, startup and padding</h2>
+<ul>
+<li>Flash vs RAM</li>
+<li>Sections: .text, .data, .bss, stack, heap</li>
+<li>What startup code does before main()</li>
+<li>Linker script idea</li>
+<li>Struct padding and alignment</li>
+<li>Endianness (little vs big)</li>
+</ul>
+<p><strong>Practice: </strong>Write a program that detects endianness; print struct sizes with and without padding.</p>
+<h2 id="13-registers-and-hardware-access">13. Registers and hardware access</h2>
+<ul>
+<li>Memory-mapped I/O</li>
+<li>Pointer to a fixed address: *(volatile uint32_t*)0x40021000</li>
+<li>Register structs and macros</li>
+<li>Function pointers for callbacks and drivers</li>
+</ul>
+<p><strong>Practice: </strong>Simulate a GPIO register in a plain C program and control its bits.</p>
+<h2 id="14-gpio-and-debouncing">14. GPIO and debouncing</h2>
+<ul>
+<li>Input and output pins, pull-up and pull-down</li>
+<li>Push-pull vs open-drain</li>
+<li>Polling</li>
+<li>Button bounce and software debouncing</li>
+</ul>
+<p><strong>Practice: </strong>Button toggles an LED with proper debounce (ESP32 or Arduino).</p>
+<h2 id="15-interrupts-and-isr">15. Interrupts and ISR</h2>
+<ul>
+<li>Vector table and interrupt priority</li>
+<li>ISR rules: keep short, no printf, no blocking, use volatile flags</li>
+<li>Race conditions and critical sections</li>
+<li>Polling vs interrupt</li>
+</ul>
+<p><strong>Practice: </strong>Button interrupt that sets a flag; main loop handles the work.</p>
+<h2 id="16-timers-pwm-and-adc">16. Timers, PWM and ADC</h2>
+<ul>
+<li>Prescaler, overflow, compare match</li>
+<li>Timer interrupt for a periodic task</li>
+<li>PWM duty cycle and frequency (LED dimming, servo)</li>
+<li>ADC resolution and sampling</li>
+</ul>
+<p><strong>Practice: </strong>Blink an LED with a timer (no delay); read a sensor with ADC and dim an LED with PWM.</p>
+<h2 id="17-communication-protocols">17. Communication protocols</h2>
+<ul>
+<li>UART: baud rate, start/stop bits, parity</li>
+<li>I2C: SDA/SCL, address, ACK, pull-up resistors</li>
+<li>SPI: MOSI, MISO, SCK, CS and modes</li>
+<li>When to choose which</li>
+</ul>
+<p><strong>Practice: </strong>Print sensor data over UART; scan I2C addresses; read one SPI device.</p>
+<h2 id="18-embedded-design-patterns">18. Embedded design patterns</h2>
+<ul>
+<li>Circular (ring) buffer</li>
+<li>Finite state machine</li>
+<li>Watchdog timer</li>
+<li>Low-power sleep modes</li>
+<li>Intro to RTOS: tasks, semaphore, queue</li>
+</ul>
+<p><strong>Practice: </strong>Ring buffer for UART receive; traffic light as a state machine.</p>
+<h1 id="5-daily-calendar-30-oct-to-30-nov">5. Daily calendar (30 Oct to 30 Nov)</h1>
+<p>Tick the box when the day is done. Weekends are shaded. If you miss a day, do not panic: move the topic to the next weekend slot instead of skipping it.</p>
+<div class="tablewrap"><table>
+<tr><th><strong>Date</strong></th><th><strong>Day</strong></th><th><strong>Topic</strong></th><th><strong>Practice (evening)</strong></th><th><strong>Done</strong></th></tr>
+<tr><td>30 Oct</td><td>Fri</td><td>Setup + data types, variables, I/O</td><td>Install GCC or use OnlineGDB. Print sizeof of every type. Add two typed numbers.</td><td>☐</td></tr>
+<tr><td>31 Oct</td><td>Sat</td><td>Operators, if/else, switch</td><td>Calculator with switch, even/odd, leap year. Solve 10 small programs.</td><td>☐</td></tr>
+<tr><td>1 Nov</td><td>Sun</td><td>Loops + revision</td><td>Patterns, prime numbers, reverse a number, sum of digits. 10 questions.</td><td>☐</td></tr>
+<tr><td>2 Nov</td><td>Mon</td><td>Functions</td><td>Write max, power, GCD, isPrime as functions. Split into .c and .h.</td><td>☐</td></tr>
+<tr><td>3 Nov</td><td>Tue</td><td>Recursion</td><td>Factorial, Fibonacci, sum of digits, decimal to binary.</td><td>☐</td></tr>
+<tr><td>4 Nov</td><td>Wed</td><td>Arrays</td><td>Min/max, reverse, sort, search, 2D matrix addition.</td><td>☐</td></tr>
+<tr><td>5 Nov</td><td>Thu</td><td>Strings</td><td>Write your own strlen, strcpy, strcmp. Reverse, palindrome.</td><td>☐</td></tr>
+<tr><td>6 Nov</td><td>Fri</td><td>Matrix + string problems</td><td>Transpose, multiply, vowel count, anagram check.</td><td>☐</td></tr>
+<tr><td>7 Nov</td><td>Sat</td><td>PROJECT 1: Contact book</td><td>Arrays + strings + functions. Push to GitHub.</td><td>☐</td></tr>
+<tr><td>8 Nov</td><td>Sun</td><td>Revise week 1 + interview Qs</td><td>Solve 10 interview questions on arrays, strings, loops.</td><td>☐</td></tr>
+<tr><td>9 Nov</td><td>Mon</td><td>Pointers: basics</td><td>&amp;, *, NULL, pointer to pointer. Draw memory diagrams on paper.</td><td>☐</td></tr>
+<tr><td>10 Nov</td><td>Tue</td><td>Pointer arithmetic + arrays</td><td>Swap with pointers; traverse arrays and strings with pointers.</td><td>☐</td></tr>
+<tr><td>11 Nov</td><td>Wed</td><td>Structs, unions, enums, typedef</td><td>Student struct array; compare sizeof struct vs union.</td><td>☐</td></tr>
+<tr><td>12 Nov</td><td>Thu</td><td>Dynamic memory</td><td>malloc, realloc, free. Deliberately create a leak and fix it.</td><td>☐</td></tr>
+<tr><td>13 Nov</td><td>Fri</td><td>Storage classes + preprocessor</td><td>Static counter, macros, include guards, 3-file project.</td><td>☐</td></tr>
+<tr><td>14 Nov</td><td>Sat</td><td>File handling + PROJECT 2</td><td>Student record manager that saves and loads from a file.</td><td>☐</td></tr>
+<tr><td>15 Nov</td><td>Sun</td><td>Revise + linked list</td><td>Singly linked list: insert, delete, reverse.</td><td>☐</td></tr>
+<tr><td>16 Nov</td><td>Mon</td><td>Embedded: bitwise operators</td><td>&amp;, |, ^, ~, &lt;&lt;, &gt;&gt; with small examples. Binary and hex practice.</td><td>☐</td></tr>
+<tr><td>17 Nov</td><td>Tue</td><td>Bit manipulation</td><td>SET_BIT, CLEAR_BIT, TOGGLE_BIT, CHECK_BIT macros. Count set bits.</td><td>☐</td></tr>
+<tr><td>18 Nov</td><td>Wed</td><td>volatile, const, static, fixed-width types</td><td>Rewrite earlier code with uint8_t/uint32_t. Explain volatile aloud.</td><td>☐</td></tr>
+<tr><td>19 Nov</td><td>Thu</td><td>Memory layout, padding, endianness</td><td>Endianness check program; struct padding experiments.</td><td>☐</td></tr>
+<tr><td>20 Nov</td><td>Fri</td><td>Registers + function pointers</td><td>Simulate a GPIO register in C; driver using function pointers.</td><td>☐</td></tr>
+<tr><td>21 Nov</td><td>Sat</td><td>PROJECT 3: Bit manipulation library</td><td>Header + source + test file. Push to GitHub.</td><td>☐</td></tr>
+<tr><td>22 Nov</td><td>Sun</td><td>Revise + 15 Embedded C questions</td><td>Answer each question out loud in 1 minute.</td><td>☐</td></tr>
+<tr><td>23 Nov</td><td>Mon</td><td>GPIO + debouncing</td><td>Button toggles LED with software debounce on your board.</td><td>☐</td></tr>
+<tr><td>24 Nov</td><td>Tue</td><td>Interrupts + ISR</td><td>Button interrupt sets a volatile flag; main loop handles it.</td><td>☐</td></tr>
+<tr><td>25 Nov</td><td>Wed</td><td>Timers + PWM</td><td>Blink with a timer (no delay). LED dimming with PWM.</td><td>☐</td></tr>
+<tr><td>26 Nov</td><td>Thu</td><td>ADC + UART</td><td>Read a sensor, print values over serial.</td><td>☐</td></tr>
+<tr><td>27 Nov</td><td>Fri</td><td>I2C + SPI</td><td>I2C scanner; read one I2C or SPI sensor.</td><td>☐</td></tr>
+<tr><td>28 Nov</td><td>Sat</td><td>PROJECT 4: Ring buffer + state machine</td><td>UART ring buffer and traffic light state machine. Push to GitHub.</td><td>☐</td></tr>
+<tr><td>29 Nov</td><td>Sun</td><td>Watchdog, sleep modes, revision</td><td>Read about watchdog and low power. Revise weak topics.</td><td>☐</td></tr>
+<tr><td>30 Nov</td><td>Mon</td><td>FINAL: mock interview + GitHub cleanup</td><td>Explain each project in 2 minutes. Update README files and resume.</td><td>☐</td></tr>
+</table></div>
+<h1 id="6-interview-questions-to-master">6. Interview questions to master</h1>
+<p>Answer each one out loud in under 1 minute. If you cannot explain it simply, you do not know it yet.</p>
+<ol>
+<li>What is the difference between a pointer and an array?</li>
+<li>What is a dangling pointer? How do you avoid it?</li>
+<li>Difference between malloc and calloc?</li>
+<li>What is a memory leak?</li>
+<li>What does static do (inside a function, and at file level)?</li>
+<li>Difference between struct and union?</li>
+<li>What is struct padding? Why does it happen?</li>
+<li>What does volatile mean? Give an example where it is needed.</li>
+<li>Can a variable be both const and volatile? Example?</li>
+<li>How do you set, clear, toggle and check a bit?</li>
+<li>How do you check if a number is a power of 2?</li>
+<li>How do you detect endianness in code?</li>
+<li>What are the .text, .data, .bss sections?</li>
+<li>What happens before main() runs on a microcontroller?</li>
+<li>What rules should an ISR follow?</li>
+<li>Why should you not call printf inside an ISR?</li>
+<li>Polling vs interrupt: when to use which?</li>
+<li>What is debouncing and how do you do it in software?</li>
+<li>Difference between UART, I2C and SPI?</li>
+<li>Why do I2C lines need pull-up resistors?</li>
+<li>What is PWM and how is duty cycle calculated?</li>
+<li>What is a watchdog timer?</li>
+<li>What is a circular buffer and where is it used?</li>
+<li>What is a function pointer? Where is it used in embedded code?</li>
+<li>Swap two numbers without a temporary variable.</li>
+</ol>
+<h1 id="7-tools-and-resources">7. Tools and resources</h1>
+<ul>
+<li>Compiler: GCC on your laptop, or OnlineGDB in the browser</li>
+<li>Practice problems: HackerRank (C domain), GeeksforGeeks, Exercism (C track)</li>
+<li>Hardware: your ESP32, ESP8266 and Arduino boards for Part B</li>
+<li>Notes: one notebook with a page for each topic (3 key points + 1 example)</li>
+<li>Code storage: GitHub, one repository per project with a clear README</li>
+</ul>
+<h1 id="8-after-30-november-december-plan">8. After 30 November (December plan)</h1>
+<ul>
+<li>Week 1: Revise pointers, bit manipulation and ISR. Redo weak interview questions.</li>
+<li>Week 2: Rewrite 2 of your older Arduino projects in clean embedded C with proper structure.</li>
+<li>Week 3: Mock interviews with a friend or mentor. Explain every project on your resume.</li>
+<li>Week 4: Apply daily to embedded and IoT roles; keep solving 2 problems a day.</li>
+</ul>
+<h1 id="9-tips-to-stay-on-track">9. Tips to stay on track</h1>
+<ul>
+<li>Study at the same time every day. Habit beats motivation.</li>
+<li>Phone on silent during the 7:30 to 9:30 slot.</li>
+<li>Do not skip pointers or bit manipulation. They are the most asked topics.</li>
+<li>Type every program yourself. Never copy and paste.</li>
+<li>Sleep at least 7 hours. A tired brain learns nothing.</li>
+</ul>

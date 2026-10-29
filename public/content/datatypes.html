@@ -1,0 +1,350 @@
+<header class="doc-head"><p class="title">Data Types in C</p><p class="subtitle">with a deep dive into int</p><p class="meta">Plain explanations, analogies, step-by-step examples and practice</p></header><div class="tablewrap"><table>
+<tr><th><strong>Part</strong></th><th><strong>What you will learn</strong></th></tr>
+<tr><td>1</td><td>What a data type is and why C needs it</td></tr>
+<tr><td>2</td><td>The families of data types and the basic ones at a glance</td></tr>
+<tr><td>3</td><td>int in detail: size, range, binary, signed vs unsigned, overflow, division, literals</td></tr>
+<tr><td>4</td><td>int on your boards (Arduino Uno vs ESP32) and the safe stdint.h types</td></tr>
+<tr><td>5</td><td>Common mistakes, practice programs and interview questions</td></tr>
+<tr><td>6</td><td>Quick look at char, float, double, void</td></tr>
+</table></div>
+<h1 id="1-what-is-a-data-type">1. What is a data type?</h1>
+<p>A data type tells the computer three things about a variable:</p>
+<ol>
+<li>How much memory to reserve for it (the size).</li>
+<li>How to read the bits stored there (as a whole number, a letter, a decimal number...).</li>
+<li>Which operations are allowed on it (you can use % on whole numbers, but not on decimals).</li>
+</ol>
+<aside class="callout info" style="--c:#2A7F8E"><p><strong>Analogy: boxes and labels</strong></p>
+<p>Think of memory as a warehouse full of boxes. A data type is the box size plus a label on the box.</p>
+<p>int is a medium box labelled "whole numbers only". char is a tiny box labelled "one character". double is a big box labelled "very precise decimal numbers".</p>
+<p>Without the label, the same contents can mean different things: the bits 01000001 can be the number 65 or the letter A. The data type decides how they are read.</p></aside>
+<h2 id="why-does-c-need-data-types">Why does C need data types?</h2>
+<ul>
+<li>C is a statically typed language: you must declare the type before using a variable.</li>
+<li>The compiler uses the type to reserve the right amount of memory. Too big wastes RAM, too small loses data. On a microcontroller with 2 KB or 520 KB of RAM, this matters a lot.</li>
+<li>The compiler uses the type to catch mistakes and to pick the right machine instruction (integer add vs floating-point add).</li>
+</ul>
+<h2 id="how-you-declare-a-variable">How you declare a variable</h2>
+<pre class="code"><code>int age;            // declaration: reserves memory, value is garbage
+int marks = 85;     // declaration + initialization
+float price = 99.5f;
+char grade = 'A';</code></pre>
+<p><strong>General form:  data_type  variable_name = value;</strong></p>
+<h1 id="2-families-of-data-types">2. Families of data types</h1>
+<div class="tablewrap"><table>
+<tr><th><strong>Family</strong></th><th><strong>Examples</strong></th><th><strong>Meaning</strong></th></tr>
+<tr><td>Basic (primary)</td><td>char, int, float, double, void</td><td>Built into the language. Everything else is built from these.</td></tr>
+<tr><td>Derived</td><td>array, pointer, function</td><td>Made from basic types (for example, an array of int).</td></tr>
+<tr><td>User-defined</td><td>struct, union, enum, typedef</td><td>You design them to group or name data.</td></tr>
+</table></div>
+<h2 id="basic-types-at-a-glance">Basic types at a glance</h2>
+<p><em>Sizes below are typical for a modern PC (64-bit). The C standard only guarantees minimums, so sizes can differ on microcontrollers (see Part 4).</em></p>
+<div class="tablewrap"><table>
+<tr><th><strong>Type</strong></th><th><strong>Size</strong></th><th><strong>Typical range</strong></th><th><strong>Format</strong></th><th><strong>Stores</strong></th></tr>
+<tr><td><code>char</code></td><td>1 byte</td><td>-128 to 127 (or 0 to 255)</td><td><code>%c or %d</code></td><td>A single character or a small number</td></tr>
+<tr><td><code>short</code></td><td>2 bytes</td><td>-32,768 to 32,767</td><td><code>%hd</code></td><td>Small whole numbers</td></tr>
+<tr><td><code>int</code></td><td>4 bytes</td><td>-2,147,483,648 to 2,147,483,647</td><td><code>%d</code></td><td>Whole numbers (most common)</td></tr>
+<tr><td><code>long</code></td><td>4 or 8 bytes</td><td>depends on system</td><td><code>%ld</code></td><td>Bigger whole numbers</td></tr>
+<tr><td><code>long long</code></td><td>8 bytes</td><td>about -9.2 x 10^18 to 9.2 x 10^18</td><td><code>%lld</code></td><td>Very big whole numbers</td></tr>
+<tr><td><code>float</code></td><td>4 bytes</td><td>about 6 to 7 digits of precision</td><td><code>%f</code></td><td>Decimal numbers</td></tr>
+<tr><td><code>double</code></td><td>8 bytes</td><td>about 15 to 16 digits of precision</td><td><code>%lf</code></td><td>Precise decimal numbers</td></tr>
+<tr><td><code>void</code></td><td>-</td><td>no value</td><td><code>-</code></td><td>"Nothing" (functions that return nothing, generic pointers)</td></tr>
+</table></div>
+<p>Tip: you can check the size on your own machine with sizeof:</p>
+<pre class="code"><code>#include &lt;stdio.h&gt;
+ 
+int main(void) {
+    printf("char      : %zu byte\n",  sizeof(char));
+    printf("short     : %zu bytes\n", sizeof(short));
+    printf("int       : %zu bytes\n", sizeof(int));
+    printf("long      : %zu bytes\n", sizeof(long));
+    printf("long long : %zu bytes\n", sizeof(long long));
+    printf("float     : %zu bytes\n", sizeof(float));
+    printf("double    : %zu bytes\n", sizeof(double));
+    return 0;
+}</code></pre>
+<p><strong>Output:</strong></p>
+<pre class="code"><code>char      : 1 byte
+short     : 2 bytes
+int       : 4 bytes
+long      : 8 bytes     (4 on Windows)
+long long : 8 bytes
+float     : 4 bytes
+double    : 8 bytes</code></pre>
+<h1 id="3-the-int-data-type-in-detail">3. The int data type in detail</h1>
+<h2 id="3-1-what-is-int">3.1 What is int?</h2>
+<p>int is short for integer. It stores whole numbers: positive, negative or zero, with no decimal point. Examples: 0, 25, -400, 100000.</p>
+<p>Use int for things you count: number of students, loop counters, marks, age, array index.</p>
+<pre class="code"><code>int students = 60;
+int temperature = -5;
+int total = students * 2;
+ 
+printf("Students = %d\n", students);   // %d prints an int
+scanf("%d", &amp;students);                // %d reads an int (note the &amp;)</code></pre>
+<aside class="callout info" style="--c:#2A7F8E"><p><strong>Remember</strong></p>
+<p>%d is the format specifier for int. Using the wrong one (for example %f for an int) prints garbage.</p></aside>
+<h2 id="3-2-how-much-memory-does-int-use">3.2 How much memory does int use?</h2>
+<p>The C standard says int must be at least 16 bits (2 bytes). In practice it depends on the processor:</p>
+<div class="tablewrap"><table>
+<tr><th><strong>Platform</strong></th><th><strong>int size</strong></th><th><strong>Range</strong></th></tr>
+<tr><td>PC / laptop (Windows, Linux, macOS)</td><td>4 bytes</td><td>-2,147,483,648 to 2,147,483,647</td></tr>
+<tr><td>ESP32, ESP8266, ARM Cortex-M (STM32)</td><td>4 bytes</td><td>-2,147,483,648 to 2,147,483,647</td></tr>
+<tr><td>Arduino Uno / Nano (AVR, 8-bit)</td><td>2 bytes</td><td>-32,768 to 32,767</td></tr>
+</table></div>
+<aside class="callout warn" style="--c:#2A7F8E"><p><strong>Why this matters for you</strong></p>
+<p>The same line of code, int x = 40000;, works on your ESP32 but breaks on an Arduino Uno, because 40000 does not fit in 2 bytes.</p>
+<p>This is why embedded engineers use fixed-width types like int32_t (see Part 4).</p></aside>
+<h2 id="3-3-how-the-range-is-calculated">3.3 How the range is calculated</h2>
+<p>A byte has 8 bits and each bit is 0 or 1. With n bits you can make 2^n different patterns.</p>
+<ol>
+<li>4 bytes = 32 bits, so 2^32 = 4,294,967,296 different values.</li>
+<li>Signed int must cover negative and positive numbers, so the values are split roughly in half.</li>
+<li>Range of signed n-bit integer: -2^(n-1) to 2^(n-1) - 1.</li>
+<li>For 32 bits: -2,147,483,648 to +2,147,483,647 (one more negative value than positive, because zero takes one slot on the positive side).</li>
+</ol>
+<div class="tablewrap"><table>
+<tr><th><strong>Bits</strong></th><th><strong>Signed range</strong></th><th><strong>Unsigned range</strong></th></tr>
+<tr><td>8</td><td>-128 to 127</td><td>0 to 255</td></tr>
+<tr><td>16</td><td>-32,768 to 32,767</td><td>0 to 65,535</td></tr>
+<tr><td>32</td><td>-2,147,483,648 to 2,147,483,647</td><td>0 to 4,294,967,295</td></tr>
+<tr><td>64</td><td>-9,223,372,036,854,775,808 to 9,223,372,036,854,775,807</td><td>0 to 18,446,744,073,709,551,615</td></tr>
+</table></div>
+<p>Print the exact limits of your compiler with limits.h:</p>
+<pre class="code"><code>#include &lt;stdio.h&gt;
+#include &lt;limits.h&gt;
+ 
+int main(void) {
+    printf("INT_MIN  = %d\n", INT_MIN);
+    printf("INT_MAX  = %d\n", INT_MAX);
+    printf("UINT_MAX = %u\n", UINT_MAX);
+    return 0;
+}</code></pre>
+<p><strong>Output:</strong></p>
+<pre class="code"><code>INT_MIN  = -2147483648
+INT_MAX  = 2147483647
+UINT_MAX = 4294967295</code></pre>
+<h2 id="3-4-int-modifiers-short-long-signed-unsigned">3.4 int modifiers: short, long, signed, unsigned</h2>
+<p>Modifiers change the size or the sign of int.</p>
+<div class="tablewrap"><table>
+<tr><th><strong>Declaration</strong></th><th><strong>Typical size</strong></th><th><strong>Format</strong></th><th><strong>Notes</strong></th></tr>
+<tr><td><code>short int  (or short)</code></td><td>2 bytes</td><td>%hd</td><td>Saves memory for small values</td></tr>
+<tr><td><code>int</code></td><td>4 bytes</td><td>%d</td><td>The default, most common</td></tr>
+<tr><td><code>long int  (or long)</code></td><td>4 or 8 bytes</td><td>%ld</td><td>4 bytes on Windows, 8 on 64-bit Linux</td></tr>
+<tr><td><code>long long int</code></td><td>8 bytes</td><td>%lld</td><td>Use for very large values</td></tr>
+<tr><td><code>unsigned int</code></td><td>4 bytes</td><td>%u</td><td>Only 0 and positive values</td></tr>
+<tr><td><code>unsigned long long</code></td><td>8 bytes</td><td>%llu</td><td>Huge positive values (for example, microsecond counters)</td></tr>
+</table></div>
+<ul>
+<li><strong>signed (default): can be negative, positive or zero. Writing int and signed int is the same thing.</strong></li>
+<li><strong>unsigned: never negative. The extra bit (no sign needed) doubles the positive range.</strong></li>
+</ul>
+<pre class="code"><code>unsigned int count = 4000000000U;   // fits only in unsigned 32-bit
+long long big = 9000000000LL;       // LL suffix = long long
+unsigned int u = 10;
+ 
+printf("%u\n", count);
+printf("%lld\n", big);</code></pre>
+<h2 id="3-5-how-int-is-stored-in-binary-two-s-complement">3.5 How int is stored in binary (two's complement)</h2>
+<p>Computers only store 0s and 1s. A positive int is stored as plain binary. Example with 8 bits for simplicity (a real int uses 32):</p>
+<div class="tablewrap"><table>
+<tr><th><strong>Decimal</strong></th><th><strong>Binary (8-bit)</strong></th><th><strong>Note</strong></th></tr>
+<tr><td>5</td><td><code>00000101</code></td><td>Plain binary: 4 + 1</td></tr>
+<tr><td>127</td><td><code>01111111</code></td><td>Largest signed 8-bit value</td></tr>
+<tr><td>-1</td><td><code>11111111</code></td><td>All bits 1 means -1 in two's complement</td></tr>
+<tr><td>-5</td><td><code>11111011</code></td><td>See the steps below</td></tr>
+<tr><td>-128</td><td><code>10000000</code></td><td>Smallest signed 8-bit value</td></tr>
+</table></div>
+<p><strong>How negative numbers are stored (two's complement). To store -5:</strong></p>
+<ol>
+<li>Write 5 in binary: 00000101</li>
+<li>Invert every bit (0 becomes 1, 1 becomes 0): 11111010</li>
+<li>Add 1: 11111011. This is -5.</li>
+</ol>
+<ul>
+<li><strong>Sign bit: the left-most bit (MSB). 0 means positive, 1 means negative.</strong></li>
+<li><strong>Why this system? The CPU can use the same adder circuit for positive and negative numbers. 5 + (-5) gives 00000000 (the carry out is thrown away).</strong></li>
+</ul>
+<p>See the bits yourself:</p>
+<pre class="code"><code>#include &lt;stdio.h&gt;
+ 
+void print_bits(unsigned char n) {
+    for (int i = 7; i &gt;= 0; i--)
+        printf("%d", (n &gt;&gt; i) &amp; 1);
+    printf("\n");
+}
+ 
+int main(void) {
+    print_bits(5);
+    print_bits((unsigned char)-5);
+    return 0;
+}</code></pre>
+<p><strong>Output:</strong></p>
+<pre class="code"><code>00000101
+11111011</code></pre>
+<h2 id="3-6-overflow-when-the-number-does-not-fit">3.6 Overflow: when the number does not fit</h2>
+<aside class="callout info" style="--c:#2A7F8E"><p><strong>Analogy: the car odometer</strong></p>
+<p>A 3-digit odometer shows 999. Drive one more kilometre and it rolls over to 000. A fixed number of bits behaves the same way: after the maximum value it wraps around.</p></aside>
+<p><strong>Unsigned overflow is well defined in C: the value wraps around (modulo 2^n).</strong></p>
+<pre class="code"><code>unsigned char x = 255;
+x = x + 1;
+printf("%d\n", x);      // 0
+ 
+unsigned char y = 0;
+y = y - 1;
+printf("%d\n", y);      // 255</code></pre>
+<p><strong>Signed overflow is undefined behaviour in C. It often wraps around in practice, but the compiler is allowed to assume it never happens, so your program can behave strangely. Never rely on it.</strong></p>
+<pre class="code"><code>int a = INT_MAX;
+a = a + 1;              // undefined behaviour: do not do this</code></pre>
+<p><strong>Real example: factorial overflows quickly with 32-bit int.</strong></p>
+<ul>
+<li>12! = 479,001,600 fits in a 32-bit int.</li>
+<li>13! = 6,227,020,800 does NOT fit. Use long long (it holds up to 20!) or check before multiplying.</li>
+</ul>
+<aside class="callout info" style="--c:#2A7F8E"><p><strong>Embedded example</strong></p>
+<p>millis() on Arduino returns an unsigned 32-bit counter that wraps to 0 after about 49.7 days. Code that compares times as (now - start) &gt;= interval keeps working across the wrap, because unsigned subtraction also wraps correctly.</p></aside>
+<h2 id="3-7-integer-division-and-the-operator">3.7 Integer division and the % operator</h2>
+<p>When both operands are int, the result is an int. The decimal part is thrown away (truncated toward zero).</p>
+<pre class="code"><code>printf("%d\n", 7 / 2);     // 3   (not 3.5)
+printf("%d\n", 7 % 2);     // 1   (remainder)
+printf("%d\n", -7 / 2);    // -3  (truncates toward zero)
+printf("%d\n", -7 % 2);    // -1  (sign follows the left number)
+printf("%f\n", 7 / 2);     // WRONG: int passed to %f
+ 
+printf("%f\n", 7 / 2.0);   // 3.500000  (one operand is double)
+printf("%f\n", (float)7 / 2); // 3.500000  (type cast)</code></pre>
+<ul>
+<li>Dividing by zero (7 / 0 or 7 % 0) crashes the program or gives undefined behaviour. Always check the divisor.</li>
+<li>% works only with integers. 7.5 % 2 is a compile error.</li>
+<li>Handy uses of %: check even/odd (n % 2), get the last digit (n % 10), wrap an index (i % size).</li>
+</ul>
+<h2 id="3-8-writing-int-values-literals-and-number-systems">3.8 Writing int values (literals and number systems)</h2>
+<div class="tablewrap"><table>
+<tr><th><strong>Literal</strong></th><th><strong>Value</strong></th><th><strong>Meaning</strong></th></tr>
+<tr><td><code>10</code></td><td>10</td><td>Decimal</td></tr>
+<tr><td><code>012</code></td><td>10</td><td>Octal (starts with 0). Easy to write by mistake!</td></tr>
+<tr><td><code>0xA  or  0x0A</code></td><td>10</td><td>Hexadecimal (starts with 0x), very common in embedded</td></tr>
+<tr><td><code>0b1010</code></td><td>10</td><td>Binary (GCC extension, standard in C23)</td></tr>
+<tr><td><code>100U, 100L, 100UL, 100LL</code></td><td>100</td><td>Suffix sets the type: unsigned, long, unsigned long, long long</td></tr>
+</table></div>
+<aside class="callout warn" style="--c:#2A7F8E"><p><strong>Careful</strong></p>
+<p>int x = 012; stores 10, not 12. A leading zero makes the number octal. Do not pad numbers with zeros in C source code.</p></aside>
+<p>Printing the same value in different systems:</p>
+<pre class="code"><code>int n = 255;
+printf("%d\n", n);    // 255  decimal
+printf("%x\n", n);    // ff   hexadecimal
+printf("%X\n", n);    // FF
+printf("%o\n", n);    // 377  octal</code></pre>
+<h2 id="3-9-mixing-int-with-other-types">3.9 Mixing int with other types</h2>
+<p>When you mix types in one expression, C converts them automatically (implicit conversion). Two rules cause most bugs:</p>
+<ol>
+<li>Smaller types (char, short) are promoted to int before arithmetic.</li>
+<li>If you mix signed and unsigned of the same size, the signed value is converted to unsigned.</li>
+</ol>
+<pre class="code"><code>int a = -1;
+unsigned int b = 1;
+ 
+if (a &lt; b)
+    printf("a is smaller\n");
+else
+    printf("b is smaller\n");   // this prints!</code></pre>
+<p>Why? -1 is converted to unsigned, which becomes 4,294,967,295, bigger than 1. This is one of the most common hidden bugs. Avoid comparing signed and unsigned values.</p>
+<p><strong>Type casting changes a type on purpose:</strong></p>
+<pre class="code"><code>int total = 7, count = 2;
+float avg = (float)total / count;   // 3.5, cast BEFORE dividing
+int x = (int)3.99;                  // 3, decimals are cut, not rounded</code></pre>
+<h1 id="4-int-in-embedded-systems-use-fixed-width-types">4. int in embedded systems: use fixed-width types</h1>
+<p>Because int can be 2 bytes on one chip and 4 bytes on another, embedded code uses types from stdint.h whose size never changes.</p>
+<div class="tablewrap"><table>
+<tr><th><strong>Type</strong></th><th><strong>Size</strong></th><th><strong>Range</strong></th><th><strong>Typical use</strong></th></tr>
+<tr><td><code>int8_t</code></td><td>1 byte</td><td>-128 to 127</td><td>Small signed values</td></tr>
+<tr><td><code>uint8_t</code></td><td>1 byte</td><td>0 to 255</td><td>Raw bytes, 8-bit registers, buffers</td></tr>
+<tr><td><code>int16_t</code></td><td>2 bytes</td><td>-32,768 to 32,767</td><td>Sensor readings with sign</td></tr>
+<tr><td><code>uint16_t</code></td><td>2 bytes</td><td>0 to 65,535</td><td>ADC values, 16-bit registers</td></tr>
+<tr><td><code>int32_t</code></td><td>4 bytes</td><td>-2.1 billion to 2.1 billion</td><td>General signed numbers</td></tr>
+<tr><td><code>uint32_t</code></td><td>4 bytes</td><td>0 to 4.29 billion</td><td>32-bit registers, timestamps</td></tr>
+<tr><td><code>int64_t / uint64_t</code></td><td>8 bytes</td><td>very large</td><td>Long counters</td></tr>
+</table></div>
+<pre class="code"><code>#include &lt;stdint.h&gt;
+ 
+uint8_t  led_state = 0;        // exactly 1 byte on every chip
+uint16_t adc_value = 3120;     // 12-bit ADC result fits
+uint32_t timestamp_ms = 0;
+int32_t  offset = -50000;</code></pre>
+<p>Printing fixed-width types: the simplest portable way is to cast to a standard type.</p>
+<pre class="code"><code>printf("%lu\n", (unsigned long)timestamp_ms);
+printf("%d\n",  (int)led_state);</code></pre>
+<h2 id="which-type-should-i-choose">Which type should I choose?</h2>
+<div class="tablewrap"><table>
+<tr><th><strong>Situation</strong></th><th><strong>Use</strong></th></tr>
+<tr><td>Loop counter, simple count on a PC or ESP32</td><td>int</td></tr>
+<tr><td>Value that is never negative (length, count, register)</td><td>unsigned type (uint8_t, uint16_t, uint32_t)</td></tr>
+<tr><td>Hardware register or byte buffer</td><td>uint8_t / uint16_t / uint32_t</td></tr>
+<tr><td>Value that can be negative and size matters</td><td>int16_t / int32_t</td></tr>
+<tr><td>Number may exceed 2 billion</td><td>int64_t or long long</td></tr>
+<tr><td>Code must run on both Arduino Uno and ESP32</td><td>Fixed-width types only</td></tr>
+</table></div>
+<h1 id="5-common-mistakes-practice-and-interview-questions">5. Common mistakes, practice and interview questions</h1>
+<h2 id="common-mistakes-with-int">Common mistakes with int</h2>
+<div class="tablewrap"><table>
+<tr><th><strong>Mistake</strong></th><th><strong>Fix</strong></th></tr>
+<tr><td>Using an int before giving it a value (garbage inside)</td><td>Always initialise: int x = 0;</td></tr>
+<tr><td>5 / 2 expecting 2.5</td><td>Use 5 / 2.0 or cast: (float)5 / 2</td></tr>
+<tr><td>Wrong format specifier (%f for int, %d for float)</td><td>Match the type: %d int, %u unsigned, %ld long, %lld long long, %f float</td></tr>
+<tr><td>Forgetting &amp; in scanf("%d", &amp;x)</td><td>scanf needs the address of the variable</td></tr>
+<tr><td>Assuming int is always 4 bytes</td><td>Check with sizeof or use int32_t</td></tr>
+<tr><td>Comparing signed and unsigned values</td><td>Make both the same type, or cast carefully</td></tr>
+<tr><td>Overflow in factorial, sum or multiplication</td><td>Use a bigger type and check ranges</td></tr>
+<tr><td>Leading zero in a number (012)</td><td>Do not write leading zeros</td></tr>
+</table></div>
+<h2 id="practice-programs-write-each-one-yourself">Practice programs (write each one yourself)</h2>
+<ol>
+<li>Print the size and the min and max value of every integer type on your computer.</li>
+<li>Read two ints and print their sum, difference, product, quotient and remainder.</li>
+<li>Swap two int variables using a temporary variable, then without one.</li>
+<li>Check whether a number is even or odd using %.</li>
+<li>Reverse the digits of an int (use % 10 and / 10 in a loop).</li>
+<li>Count the digits of an int.</li>
+<li>Write print_bits for an int (32 bits) and print 5, -5 and 255.</li>
+<li>Show unsigned overflow: increase an unsigned char past 255 and print it.</li>
+<li>Compute factorial for n = 1 to 15 with int. Find the first n where the answer becomes wrong. Then fix it with unsigned long long.</li>
+<li>Print the number 255 in decimal, hexadecimal and octal.</li>
+</ol>
+<h2 id="interview-questions-with-short-answers">Interview questions with short answers</h2>
+<p><strong>Q1. What is the size of int in C? It depends on the compiler and the processor. At least 16 bits by the standard; 32 bits on most modern systems (PC, ESP32, ARM), 16 bits on 8-bit AVR (Arduino Uno).</strong></p>
+<p><strong>Q2. What is the range of a 32-bit signed int? -2,147,483,648 to 2,147,483,647, which is -2^31 to 2^31 - 1.</strong></p>
+<p><strong>Q3. How are negative numbers stored? In two's complement: invert all bits of the positive number and add 1. The left-most bit acts as the sign bit.</strong></p>
+<p><strong>Q4. Difference between signed and unsigned int? Signed can hold negative values; unsigned cannot but has twice the positive range.</strong></p>
+<p><strong>Q5. What happens on integer overflow? Unsigned wraps around (modulo 2^n). Signed overflow is undefined behaviour.</strong></p>
+<p><strong>Q6. What is the result of 7 / 2 in C? 3, because both operands are int and the decimal part is truncated.</strong></p>
+<p><strong>Q7. What is the result of -7 % 2? -1. The sign of the remainder follows the left operand (since C99).</strong></p>
+<p><strong>Q8. Why use uint8_t instead of unsigned char or int in embedded code? Its size is guaranteed (exactly 8 bits), so the code behaves the same on every chip, and it clearly shows the data is a raw byte.</strong></p>
+<p><strong>Q9. What does this print: int a = -1; unsigned int b = 1; printf("%d", a &lt; b); 0, because a is converted to unsigned (4,294,967,295) and the comparison is false.</strong></p>
+<p><strong>Q10. What is the difference between int x = 012 and int x = 12? 012 is octal and equals 10; 12 is decimal and equals 12.</strong></p>
+<h1 id="6-quick-look-at-the-other-basic-types">6. Quick look at the other basic types</h1>
+<p>Each of these deserves its own detailed chapter. Here is the short version so the overview is complete.</p>
+<h2 id="char">char</h2>
+<ul>
+<li>Size: 1 byte. Stores one character such as 'A', or a small number.</li>
+<li>A character is stored as its ASCII number: 'A' is 65, 'a' is 97, '0' is 48.</li>
+<li>Use %c to print as a letter and %d to print the number.</li>
+<li>Whether plain char is signed or unsigned depends on the compiler, so use uint8_t for raw bytes.</li>
+</ul>
+<pre class="code"><code>char ch = 'A';
+printf("%c %d\n", ch, ch);    // A 65
+printf("%c\n", ch + 1);        // B</code></pre>
+<h2 id="float-and-double">float and double</h2>
+<ul>
+<li>Store numbers with a decimal point. They are stored in binary scientific form (IEEE 754), so many decimals are only approximate.</li>
+<li>float: 4 bytes, about 6 to 7 correct digits. double: 8 bytes, about 15 to 16 correct digits.</li>
+<li>Never compare two floats with ==. Compare the difference with a small tolerance instead.</li>
+<li>Many small microcontrollers have no floating-point hardware, so float maths is slow there. Prefer integers when you can (for example, store 25.5 degrees as 255 tenths).</li>
+</ul>
+<pre class="code"><code>float a = 0.1f + 0.2f;
+printf("%.10f\n", a);   // 0.3000000119 (not exactly 0.3)</code></pre>
+<h2 id="void">void</h2>
+<ul>
+<li>Means "no value". Used for functions that return nothing (void blink(void)) and for generic pointers (void *).</li>
+<li>You cannot create a variable of type void.</li>
+</ul>
+<aside class="callout info" style="--c:#2A7F8E"><p><strong>Next step</strong></p>
+<p>Practise all 10 programs from Part 5 before moving on. Once int feels easy, ask for the same detailed chapter on char, float/double and pointers.</p></aside>

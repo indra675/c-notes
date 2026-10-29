@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: c-embedded-notes
+    runtime: static
+    staticPublishPath: ./public
+    headers:
+      - path: /*
+        name: X-Content-Type-Options
+        value: nosniff
+      - path: /content/*
+        name: Cache-Control
+        value: public, max-age=300

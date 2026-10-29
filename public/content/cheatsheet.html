@@ -1,0 +1,282 @@
+<header class="doc-head"><p class="title">C and Embedded C</p><p class="subtitle">Interview Cheat Sheet</p><p class="meta">Read this the night before and again one hour before the interview.</p></header><aside class="callout info" style="--c:#2A7F8E"><p><strong>How to answer any question (30 seconds)</strong></p>
+<p>1. Say the definition in one line.   2. Give a tiny example.   3. Say why it matters in embedded.</p>
+<p>Example: "volatile tells the compiler a value can change outside normal code flow, so it must read it from memory every time. I use it for hardware registers and flags changed in an ISR."</p></aside>
+<h1 id="1-top-30-one-line-answers">1. Top 30 one-line answers</h1>
+<div class="tablewrap"><table>
+<tr><th><strong>Question</strong></th><th><strong>Answer</strong></th></tr>
+<tr><td>Pointer?</td><td>A variable that stores a memory address. &amp; = address of, * = value at.</td></tr>
+<tr><td>Dangling pointer?</td><td>Points to memory that was freed or went out of scope.</td></tr>
+<tr><td>Wild pointer?</td><td>Pointer never initialised, holds a random address.</td></tr>
+<tr><td>NULL pointer?</td><td>Pointer holding 0, points to nothing. Always check before use.</td></tr>
+<tr><td>void pointer?</td><td>Generic pointer without a type. Cast before dereferencing.</td></tr>
+<tr><td>const vs #define?</td><td>const is a typed variable the compiler protects; #define is typeless text replacement.</td></tr>
+<tr><td>static (local)?</td><td>Keeps its value between calls; lives for the whole program.</td></tr>
+<tr><td>static (global/function)?</td><td>Visible only inside that .c file.</td></tr>
+<tr><td>extern?</td><td>Declares a variable defined in another file.</td></tr>
+<tr><td>volatile?</td><td>Value can change outside the code (hardware, ISR). Compiler must not cache it.</td></tr>
+<tr><td>const volatile?</td><td>Read-only for code, changed by hardware (status register).</td></tr>
+<tr><td>struct vs union?</td><td>Struct: members have separate memory. Union: all members share one memory.</td></tr>
+<tr><td>Struct padding?</td><td>Gaps added for alignment. Order members large to small to save RAM.</td></tr>
+<tr><td>Stack vs heap?</td><td>Stack: automatic, fast, for locals. Heap: manual (malloc/free), flexible, can leak.</td></tr>
+<tr><td>Memory leak?</td><td>malloc without free; memory becomes unreachable.</td></tr>
+<tr><td>malloc vs calloc?</td><td>calloc zeroes memory and takes (count, size).</td></tr>
+<tr><td>.text .data .bss?</td><td>Code | initialised globals | zero-initialised globals.</td></tr>
+<tr><td>Why globals are 0, locals garbage?</td><td>Startup code clears .bss; locals sit on the stack with old data.</td></tr>
+<tr><td>What runs before main()?</td><td>Reset handler: set stack, copy .data to RAM, zero .bss, init clock, call main.</td></tr>
+<tr><td>Endianness?</td><td>Byte order of multi-byte values. ESP32, AVR, most ARM are little-endian.</td></tr>
+<tr><td>ISR rules?</td><td>Short, no delay, no printf, no malloc, shared data volatile, set flag and return.</td></tr>
+<tr><td>Interrupt latency?</td><td>Time from the event to the first instruction of the ISR.</td></tr>
+<tr><td>Polling vs interrupt?</td><td>Polling checks repeatedly (simple, wastes CPU); interrupt reacts to events (fast, saves CPU).</td></tr>
+<tr><td>Race condition?</td><td>Result depends on timing between ISR and main using the same data.</td></tr>
+<tr><td>Switch bounce?</td><td>Contacts make/break for 1 to 20 ms. Fix: RC filter or software timing.</td></tr>
+<tr><td>Pull-up resistor?</td><td>Holds an input HIGH when nothing drives it; avoids a floating pin.</td></tr>
+<tr><td>PWM?</td><td>Fast on/off switching; duty cycle sets average power.</td></tr>
+<tr><td>Watchdog?</td><td>Hardware timer that resets the chip if software does not kick it in time.</td></tr>
+<tr><td>UART / I2C / SPI?</td><td>UART: 2 devices, async. I2C: 2 shared wires, addresses. SPI: 4 wires, fast, chip select.</td></tr>
+<tr><td>Why avoid malloc in firmware?</td><td>Fragmentation, unpredictable timing, tiny RAM.</td></tr>
+</table></div>
+<h1 id="2-c-language-quick-reference">2. C language quick reference</h1>
+<h2 id="type-sizes-bytes-and-ranges">Type sizes (bytes) and ranges</h2>
+<div class="tablewrap"><table>
+<tr><th><strong>Type</strong></th><th><strong>PC</strong></th><th><strong>Uno (AVR)</strong></th><th><strong>ESP32 / STM32</strong></th><th><strong>Range (signed)</strong></th></tr>
+<tr><td>char</td><td>1</td><td>1</td><td>1</td><td>-128 to 127</td></tr>
+<tr><td>short</td><td>2</td><td>2</td><td>2</td><td>-32,768 to 32,767</td></tr>
+<tr><td>int</td><td>4</td><td>2</td><td>4</td><td>16-bit: +/-32K   32-bit: +/-2.1 billion</td></tr>
+<tr><td>long</td><td>4 or 8</td><td>4</td><td>4</td><td>+/-2.1 billion (4 bytes)</td></tr>
+<tr><td>long long</td><td>8</td><td>8</td><td>8</td><td>+/-9.2 x 10^18</td></tr>
+<tr><td>float / double</td><td>4 / 8</td><td>4 / 4</td><td>4 / 8</td><td>6-7 / 15-16 digits</td></tr>
+<tr><td>pointer</td><td>8</td><td>2</td><td>4</td><td>holds an address</td></tr>
+</table></div>
+<p>Unsigned: 8 bit 0..255, 16 bit 0..65,535, 32 bit 0..4,294,967,295. Signed n-bit: -2^(n-1) to 2^(n-1) - 1.</p>
+<p><strong>Negative numbers: two's complement = invert bits, add 1.  -5 in 8 bit = 11111011.</strong></p>
+<h2 id="format-specifiers">Format specifiers</h2>
+<div class="tablewrap"><table>
+<tr><th><strong>%d</strong></th><th><strong>int</strong></th><th><strong>%u</strong></th><th><strong>unsigned</strong></th><th><strong>%c</strong></th><th><strong>char</strong></th></tr>
+<tr><td><code>%ld</code></td><td>long</td><td><code>%lld</code></td><td>long long</td><td><code>%s</code></td><td>string</td></tr>
+<tr><td><code>%f</code></td><td>float/double</td><td><code>%lf</code></td><td>double (scanf)</td><td><code>%p</code></td><td>pointer</td></tr>
+<tr><td><code>%x</code></td><td>hex</td><td><code>%o</code></td><td>octal</td><td><code>%zu</code></td><td>size_t</td></tr>
+</table></div>
+<h2 id="operator-precedence-high-to-low">Operator precedence (high to low)</h2>
+<p><strong>Brackets  &gt;  Unary (! ~ ++ -- * &amp; sizeof)  &gt;  * / %  &gt;  + -  &gt;  &lt;&lt; &gt;&gt;  &gt;  &lt; &lt;= &gt; &gt;=  &gt;  == !=  &gt;  &amp;  &gt;  ^  &gt;  |  &gt;  &amp;&amp;  &gt;  ||  &gt;  ?:  &gt;  =</strong></p>
+<p>Remember: &amp; is LOWER than ==, so write (x &amp; 4) == 4. When in doubt, use brackets.</p>
+<h2 id="pointers">Pointers</h2>
+<div class="tablewrap"><table>
+<tr><th><strong>Declaration</strong></th><th><strong>Meaning (read right to left)</strong></th></tr>
+<tr><td><code>int *p</code></td><td>p is a pointer to int</td></tr>
+<tr><td><code>const int *p</code></td><td>pointer to constant int: cannot change *p</td></tr>
+<tr><td><code>int *const p</code></td><td>constant pointer: cannot move p</td></tr>
+<tr><td><code>int **pp</code></td><td>pointer to pointer to int</td></tr>
+<tr><td><code>int *arr[5]</code></td><td>array of 5 pointers to int</td></tr>
+<tr><td><code>int (*fp)(int, int)</code></td><td>pointer to function(int, int) returning int</td></tr>
+<tr><td><code>arr[i]  ==  *(arr + i)</code></td><td>indexing is pointer arithmetic; p + 1 moves by sizeof(type)</td></tr>
+</table></div>
+<p><strong>Mnemonic: &amp; = WHERE (address), * = WHAT (value there).</strong></p>
+<h2 id="storage-classes">Storage classes</h2>
+<div class="tablewrap"><table>
+<tr><th><strong>Class</strong></th><th><strong>Scope</strong></th><th><strong>Lifetime</strong></th><th><strong>Note</strong></th></tr>
+<tr><td><code>auto</code></td><td>block</td><td>block</td><td>default for locals, garbage value</td></tr>
+<tr><td><code>register</code></td><td>block</td><td>block</td><td>hint only, modern compilers ignore</td></tr>
+<tr><td><code>static</code></td><td>block or file</td><td>whole program</td><td>default value 0, private to file</td></tr>
+<tr><td><code>extern</code></td><td>whole program</td><td>whole program</td><td>declared here, defined elsewhere</td></tr>
+</table></div>
+<h2 id="strings-and-memory-rules">Strings and memory rules</h2>
+<ul>
+<li>String = char array ending with '\0'. "hello" needs 6 bytes. strlen = 5, sizeof = 6.</li>
+<li>Compare strings with strcmp (0 means equal), never ==.</li>
+<li>char s[] = "hi" is modifiable. char *s = "hi" points to read-only text.</li>
+<li>malloc: check for NULL, use n * sizeof *p, free once, set pointer to NULL after free.</li>
+<li>realloc: assign to a temporary pointer first, otherwise a failure leaks the old block.</li>
+<li>Macros: put every parameter and the whole expression in brackets. Header files: add include guards.</li>
+<li>Call by value: functions get copies. Pass a pointer to change the caller's variable.</li>
+</ul>
+<h1 id="3-embedded-c-quick-reference">3. Embedded C quick reference</h1>
+<h2 id="bit-manipulation">Bit manipulation</h2>
+<div class="tablewrap"><table>
+<tr><th><strong>Goal</strong></th><th><strong>Code</strong></th><th><strong>Mnemonic</strong></th></tr>
+<tr><td>Set bit n</td><td><code>x |= (1U &lt;&lt; n);</code></td><td>SET = OR</td></tr>
+<tr><td>Clear bit n</td><td><code>x &amp;= ~(1U &lt;&lt; n);</code></td><td>CLEAR = AND-NOT</td></tr>
+<tr><td>Toggle bit n</td><td><code>x ^= (1U &lt;&lt; n);</code></td><td>TOGGLE = XOR</td></tr>
+<tr><td>Check bit n</td><td><code>(x &gt;&gt; n) &amp; 1</code></td><td>CHECK = AND</td></tr>
+<tr><td>Read field</td><td><code>(x &gt;&gt; pos) &amp; mask</code></td><td>shift down, then mask</td></tr>
+<tr><td>Write field</td><td><code>x = (x &amp; ~(mask &lt;&lt; pos)) | (val &lt;&lt; pos);</code></td><td>clear it, then set it</td></tr>
+</table></div>
+<p>Shift left n = multiply by 2^n.   Shift right n = divide by 2^n (unsigned).   Use unsigned types and 1U for bit work.</p>
+<p><strong><code>12 &amp; 10 = 8     12 | 10 = 14     12 ^ 10 = 6     ~12 = -13     12 &lt;&lt; 1 = 24     12 &gt;&gt; 1 = 6</code></strong></p>
+<h2 id="volatile-needed-for-3-things">volatile: needed for 3 things</h2>
+<p><strong>Mnemonic RIS:  Register (hardware)   |   Interrupt-changed flag   |   Shared between tasks.</strong></p>
+<p>volatile does NOT make access atomic. For multi-byte shared data, disable interrupts briefly.</p>
+<h2 id="memory">Memory</h2>
+<div class="tablewrap"><table>
+<tr><th><strong>Section</strong></th><th><strong>Holds</strong></th><th><strong>Where</strong></th></tr>
+<tr><td><code>.text</code></td><td>code</td><td>Flash</td></tr>
+<tr><td><code>.rodata</code></td><td>const data, string literals</td><td>Flash</td></tr>
+<tr><td><code>.data</code></td><td>initialised globals / statics</td><td>Flash copy -&gt; RAM</td></tr>
+<tr><td><code>.bss</code></td><td>zero or uninitialised globals</td><td>RAM (zeroed at startup)</td></tr>
+<tr><td><code>Heap</code></td><td>malloc, grows up</td><td>RAM</td></tr>
+<tr><td><code>Stack</code></td><td>locals, return addresses, grows down</td><td>RAM</td></tr>
+</table></div>
+<p>Startup order: vector table -&gt; Reset handler -&gt; set stack -&gt; copy .data -&gt; zero .bss -&gt; init clocks -&gt; main().</p>
+<p>Little-endian: 0x12345678 stored as 78 56 34 12.   Padding: struct {char; int; char} = 12 bytes, reorder to {int; char; char} = 8 bytes.</p>
+<p>Stack overflow causes: deep recursion, large local arrays. Fix: make buffers static, avoid recursion, increase task stack.</p>
+<h2 id="interrupts">Interrupts</h2>
+<p><strong>Flow: event -&gt; flag -&gt; finish instruction -&gt; save context -&gt; vector table -&gt; ISR -&gt; restore -&gt; resume.</strong></p>
+<p><strong>ISR mnemonic: SHORT, SIMPLE, no SLEEP (delay), no PRINT. Set a flag, return, do the work in main.</strong></p>
+<ul>
+<li>Shared variables: volatile. Multi-byte reads on 8-bit chips: noInterrupts() ... interrupts().</li>
+<li>ESP32 ISRs need IRAM_ATTR. Uno external interrupts only on pins 2 and 3.</li>
+<li>Clear the interrupt flag if the hardware requires it, or the ISR fires again forever.</li>
+<li>Debounce button interrupts (ignore triggers within about 50 ms).</li>
+</ul>
+<h2 id="gpio">GPIO</h2>
+<ul>
+<li>Active-low button: INPUT_PULLUP, pressed = LOW. Input floating = random values.</li>
+<li>Push-pull drives high and low. Open-drain pulls low only, needs pull-up (I2C).</li>
+<li>LED resistor: R = (Vsupply - Vled) / I.  Example: (3.3 - 2.0) / 0.01 = 130 ohm, use 220 ohm.</li>
+<li>Motors, relays, solenoids: use a transistor or driver with flyback diode, never a bare GPIO.</li>
+<li>ESP32 GPIO 34 to 39: input only, no internal pull-ups. ESP32 / ESP8266 pins are 3.3 V only.</li>
+</ul>
+<h1 id="4-formulas-to-remember">4. Formulas to remember</h1>
+<div class="tablewrap"><table>
+<tr><th><strong>What</strong></th><th><strong>Formula and example</strong></th></tr>
+<tr><td>Timer tick rate</td><td>f_timer = f_clock / prescaler.   16 MHz / 64 = 250 kHz (4 us per tick)</td></tr>
+<tr><td>Timer compare value</td><td>ticks = time x f_timer, compare = ticks - 1.   1 ms: 250 ticks, OCR = 249</td></tr>
+<tr><td>PWM duty cycle</td><td>duty % = ON time / period x 100.   Average voltage = duty x Vcc</td></tr>
+<tr><td>PWM 8-bit</td><td>256 levels (0 to 255).   value 128 is about 50%</td></tr>
+<tr><td>ADC voltage</td><td>V = count x Vref / maxCount.   Uno: 512 x 5 / 1023 = 2.5 V</td></tr>
+<tr><td>ADC step size</td><td>Vref / 2^N.   10-bit at 5 V = 4.9 mV;   12-bit at 3.3 V = 0.8 mV</td></tr>
+<tr><td>ADC counts</td><td>Uno / ESP8266: 0 to 1023 (10-bit).   ESP32: 0 to 4095 (12-bit)</td></tr>
+<tr><td>UART byte time</td><td>10 bits / baud.   9600 baud = 1.04 ms per byte;  115200 = 87 us</td></tr>
+<tr><td>LM35 temperature</td><td>degC = volts x 100  (10 mV per degree)</td></tr>
+<tr><td>Average current</td><td>(I_active x t_active + I_sleep x t_sleep) / t_total</td></tr>
+<tr><td>millis() safe compare</td><td>now - previous &gt;= interval  (works across wrap-around, unsigned)</td></tr>
+<tr><td>Servo</td><td>50 Hz (20 ms), pulse 1 ms to 2 ms for full travel</td></tr>
+</table></div>
+<h1 id="5-protocols-side-by-side">5. Protocols side by side</h1>
+<div class="tablewrap"><table>
+<tr><th></th><th><strong>UART</strong></th><th><strong>I2C</strong></th><th><strong>SPI</strong></th></tr>
+<tr><td>Wires</td><td>TX, RX, GND</td><td>SDA, SCL (+ pull-ups)</td><td>SCK, MOSI, MISO, CS</td></tr>
+<tr><td>Devices</td><td>2 only</td><td>many (7-bit address)</td><td>many (one CS each)</td></tr>
+<tr><td>Clock</td><td>none, same baud</td><td>master clock</td><td>master clock</td></tr>
+<tr><td>Speed</td><td>9600 to 1M+ baud</td><td>100 / 400 kHz</td><td>1 to 50+ MHz</td></tr>
+<tr><td>Duplex</td><td>full</td><td>half</td><td>full</td></tr>
+<tr><td>Used for</td><td>PC, GPS, Bluetooth</td><td>sensors, OLED, RTC</td><td>SD card, TFT, flash</td></tr>
+<tr><td>Gotcha</td><td>cross TX/RX, same baud, common GND</td><td>pull-ups 4.7k, address clash</td><td>mode (CPOL/CPHA), CS</td></tr>
+</table></div>
+<p>UART frame 8N1: start bit, 8 data bits (LSB first), no parity, stop bit.   I2C default pins: Uno A4/A5, ESP32 GPIO 21/22.</p>
+<p><strong>Choose: PC or module with serial port = UART.  Many slow sensors on few pins = I2C.  High speed data = SPI.</strong></p>
+<h1 id="6-design-patterns-in-one-line-each">6. Design patterns in one line each</h1>
+<div class="tablewrap"><table>
+<tr><th><strong>Pattern</strong></th><th><strong>Remember</strong></th></tr>
+<tr><td>Ring buffer</td><td>head writes, tail reads, wrap with (i + 1) &amp; (SIZE - 1); empty: head == tail; full: next(head) == tail.</td></tr>
+<tr><td>State machine</td><td>enum for states + switch; each state checks an event or millis() and sets the next state; never blocks.</td></tr>
+<tr><td>Watchdog</td><td>Kick from main loop only when healthy, never from an ISR.</td></tr>
+<tr><td>Deep sleep</td><td>Wake, measure, send, sleep. Restarts at setup(); keep data in RTC memory.</td></tr>
+<tr><td>RTOS task</td><td>Own stack and priority; use vTaskDelay, queues and mutexes for sharing.</td></tr>
+<tr><td>Callback</td><td>Driver stores a function pointer; calls it when the event happens.</td></tr>
+<tr><td>Super-loop</td><td>while(1) { read inputs; update state; write outputs; }</td></tr>
+</table></div>
+<h1 id="7-code-you-must-be-able-to-write-from-memory">7. Code you must be able to write from memory</h1>
+<h2 id="bit-macros">Bit macros</h2>
+<pre class="code"><code>#define SET_BIT(x, n)     ((x) |=  (1U &lt;&lt; (n)))
+#define CLEAR_BIT(x, n)   ((x) &amp;= ~(1U &lt;&lt; (n)))
+#define TOGGLE_BIT(x, n)  ((x) ^=  (1U &lt;&lt; (n)))
+#define CHECK_BIT(x, n)   (((x) &gt;&gt; (n)) &amp; 1U)</code></pre>
+<h2 id="power-of-2-count-set-bits-swap">Power of 2, count set bits, swap</h2>
+<pre class="code"><code>int is_pow2(unsigned n) { return n &amp;&amp; !(n &amp; (n - 1)); }
+ 
+int count_bits(unsigned n) {
+    int c = 0;
+    while (n) { n &amp;= n - 1; c++; }      // removes lowest 1 each loop
+    return c;
+}
+ 
+void swap(int *a, int *b) { int t = *a; *a = *b; *b = t; }
+// no temp: a ^= b; b ^= a; a ^= b;</code></pre>
+<h2 id="strings">Strings</h2>
+<pre class="code"><code>int my_strlen(const char *s) {
+    int n = 0;
+    while (*s++) n++;
+    return n;
+}
+ 
+void reverse(char *s) {
+    int i = 0, j = my_strlen(s) - 1;
+    while (i &lt; j) { char t = s[i]; s[i++] = s[j]; s[j--] = t; }
+}</code></pre>
+<h2 id="endianness-check">Endianness check</h2>
+<pre class="code"><code>uint32_t x = 1;
+if (*(uint8_t *)&amp;x == 1) puts("little-endian");
+else                     puts("big-endian");</code></pre>
+<h2 id="register-access-and-function-pointer">Register access and function pointer</h2>
+<pre class="code"><code>#define REG  (*(volatile uint32_t *)0x40020014)   // example address
+REG |= (1U &lt;&lt; 5);
+ 
+typedef void (*Callback)(void);
+Callback cb = my_handler;
+cb();</code></pre>
+<h2 id="ring-buffer-put-and-get">Ring buffer (put and get)</h2>
+<pre class="code"><code>bool rb_put(RB *r, uint8_t b) {
+    uint8_t next = (r-&gt;head + 1) &amp; (SIZE - 1);
+    if (next == r-&gt;tail) return false;      // full
+    r-&gt;buf[r-&gt;head] = b;  r-&gt;head = next;  return true;
+}
+bool rb_get(RB *r, uint8_t *b) {
+    if (r-&gt;head == r-&gt;tail) return false;   // empty
+    *b = r-&gt;buf[r-&gt;tail];  r-&gt;tail = (r-&gt;tail + 1) &amp; (SIZE - 1);  return true;
+}</code></pre>
+<h2 id="non-blocking-blink-and-debounce-skeleton">Non-blocking blink and debounce skeleton</h2>
+<pre class="code"><code>if (millis() - previous &gt;= 1000) { previous = millis(); toggle(); }
+ 
+if (reading != lastReading) lastChange = millis();
+lastReading = reading;
+if (millis() - lastChange &gt; 30 &amp;&amp; reading != stable) {
+    stable = reading;                       // accepted: real press or release
+}</code></pre>
+<h1 id="8-tricky-output-questions">8. Tricky output questions</h1>
+<div class="tablewrap"><table>
+<tr><th><strong>Code</strong></th><th><strong>Result</strong></th><th><strong>Why</strong></th></tr>
+<tr><td>7 / 2</td><td>3</td><td>integer division</td></tr>
+<tr><td>-7 / 2   and   -7 % 2</td><td>-3   and   -1</td><td>truncates toward zero; remainder takes the sign of the left side</td></tr>
+<tr><td>sizeof("hello")   strlen("hello")</td><td>6   5</td><td>sizeof counts \0</td></tr>
+<tr><td>sizeof('a') in C</td><td>4 (int size)</td><td>a character constant is an int in C</td></tr>
+<tr><td>unsigned char c = 255; c++;</td><td>0</td><td>unsigned wraps around</td></tr>
+<tr><td>if (-1 &lt; 1u)</td><td>false</td><td>-1 converts to a huge unsigned value</td></tr>
+<tr><td>0.1 + 0.2 == 0.3</td><td>false</td><td>binary floating point is approximate</td></tr>
+<tr><td>int x = 012;</td><td>x = 10</td><td>leading 0 means octal</td></tr>
+<tr><td>5 &amp; 3   5 | 3   5 ^ 3   ~5</td><td>1   7   6   -6</td><td>bit by bit</td></tr>
+<tr><td>5 &amp;&amp; 3   !5   !0</td><td>1   0   1</td><td>logical operators give 0 or 1</td></tr>
+<tr><td>int a = 5; b = a++;   c = ++a;</td><td>b = 5, c = 7</td><td>post uses then adds; pre adds then uses</td></tr>
+<tr><td>printf("%d", printf("hi"));</td><td>hi2</td><td>printf returns the number of characters printed</td></tr>
+<tr><td>sizeof(arr) inside a function with int arr[]</td><td>pointer size</td><td>array parameter decays to a pointer</td></tr>
+<tr><td>char *p = "hi"; p[0] = 'H';</td><td>undefined behaviour</td><td>string literal is read-only</td></tr>
+<tr><td>int arr[5]; arr[5] = 1;</td><td>undefined behaviour</td><td>out of bounds, C does not check</td></tr>
+<tr><td>1 &lt;&lt; 31 on a 32-bit signed int</td><td>undefined behaviour</td><td>shifts into the sign bit; use 1U &lt;&lt; 31</td></tr>
+<tr><td>i = i++ + ++i;</td><td>undefined behaviour</td><td>modified twice without a sequence point</td></tr>
+<tr><td>#define SQ(x) x*x    SQ(2+3)</td><td>11</td><td>2+3*2+3; brackets missing</td></tr>
+</table></div>
+<h1 id="9-mnemonics">9. Mnemonics</h1>
+<div class="tablewrap"><table>
+<tr><th><strong>Topic</strong></th><th><strong>Memory trick</strong></th></tr>
+<tr><td>Bit operations</td><td>Set = OR, Clear = AND NOT, Toggle = XOR, Check = AND.</td></tr>
+<tr><td>Pointers</td><td>&amp; = where, * = what. Read declarations right to left.</td></tr>
+<tr><td>volatile (RIS)</td><td>Register, Interrupt flag, Shared data.</td></tr>
+<tr><td>ISR</td><td>Short, Simple, no Sleep, no Print.</td></tr>
+<tr><td>Memory sections</td><td>Text = code (flash), Data = given values, BSS = Zeros at start.</td></tr>
+<tr><td>Heap vs stack</td><td>Stack = automatic hotel room; heap = rented hall you must return.</td></tr>
+<tr><td>SPI wires</td><td>SCK clock, MOSI master out, MISO master in, CS choose.</td></tr>
+<tr><td>I2C</td><td>Two wires, many names (addresses), pull-ups required.</td></tr>
+<tr><td>Debounce</td><td>Wait until the signal stays steady for 20 to 50 ms.</td></tr>
+<tr><td>Endianness</td><td>Little-endian: little end (lowest byte) first.</td></tr>
+</table></div>
+<h1 id="10-interview-day-checklist">10. Interview day checklist</h1>
+<ul>
+<li>Know your projects cold: purpose, hardware, sensors, protocols, the hardest bug, what you would improve. Practise a 2-minute explanation for each.</li>
+<li>Say "I don't know, but I would find out by checking the datasheet or testing it" instead of guessing. Honesty plus method impresses.</li>
+<li>Think aloud when solving a coding question: state the approach, write the code, test with an edge case (0, 1, maximum, empty input).</li>
+<li>Draw diagrams when asked about memory, interrupts or protocols. Diagrams show understanding.</li>
+<li>Link answers to your own work: debouncing in your door lock, ADC in your soil sensor, I2C in your OLED projects, interrupts in your traffic signal.</li>
+<li>Ask one good question at the end: "What does a typical day or first project look like for this role?"</li>
+<li>Sleep well, carry a pen and paper, and be 15 minutes early.</li>
+</ul>
+<aside class="callout info" style="--c:#2A7F8E"><p><strong>Last-minute rule</strong></p>
+<p>If you remember only 5 things: pointers, bit manipulation, volatile, memory sections and ISR rules. These come up in almost every embedded interview.</p></aside>

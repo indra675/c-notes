@@ -1,0 +1,2516 @@
+<header class="doc-head"><p class="title">C and Embedded C</p><p class="subtitle">The Complete Topic-by-Topic Study Guide</p><p class="meta">18 topics with explanations, analogies, code with output, common mistakes, practice programs and interview questions</p></header><h2 id="how-to-use-this-guide">How to use this guide</h2>
+<ol>
+<li>Read the "In one line" box first. If you can already say it in your own words, skim; otherwise read slowly.</li>
+<li>Type every code example yourself (do not copy and paste), run it and change something to see what breaks.</li>
+<li>Read "Common mistakes" before you write your own programs. These are the bugs you will otherwise meet in real life.</li>
+<li>Do the practice programs. Reading is 20% of learning; writing code is 80%.</li>
+<li>Answer the interview questions out loud in your own words, then compare with the short answers.</li>
+</ol>
+<aside class="callout info" style="--c:#2A7F8E"><p><strong>Reading the code examples</strong></p>
+<p>Part A examples run on any PC with GCC or on OnlineGDB.</p>
+<p>Part B examples marked with setup() and loop() are Arduino-style sketches for your ESP32, ESP8266 or Uno. Register-level examples (DDRB, PORTB, TCCR2A) are for the Arduino Uno (AVR) and show the idea; addresses in other examples are illustrations, so always check the datasheet of your chip.</p></aside>
+<h2 id="contents-and-study-order">Contents and study order</h2>
+<div class="tablewrap"><table>
+<tr><th><strong>No.</strong></th><th><strong>Topic</strong></th><th><strong>Part</strong></th><th><strong>Suggested dates (2026)</strong></th></tr>
+<tr><td>1</td><td>Basics and Data Types</td><td>A. C language</td><td>Oct 30</td></tr>
+<tr><td>2</td><td>Operators and Control Flow</td><td>A. C language</td><td>Oct 31 - Nov 1</td></tr>
+<tr><td>3</td><td>Functions and Recursion</td><td>A. C language</td><td>Nov 2 - 3</td></tr>
+<tr><td>4</td><td>Arrays and Strings</td><td>A. C language</td><td>Nov 4 - 6</td></tr>
+<tr><td>5</td><td>Pointers</td><td>A. C language</td><td>Nov 9 - 10</td></tr>
+<tr><td>6</td><td>Structures, Unions, Enums and typedef</td><td>A. C language</td><td>Nov 11</td></tr>
+<tr><td>7</td><td>Dynamic Memory Allocation</td><td>A. C language</td><td>Nov 12</td></tr>
+<tr><td>8</td><td>Storage Classes and the Preprocessor</td><td>A. C language</td><td>Nov 13</td></tr>
+<tr><td>9</td><td>File Handling</td><td>A. C language</td><td>Nov 14</td></tr>
+<tr><td>10</td><td>Bitwise Operators and Bit Manipulation</td><td>B. Embedded C</td><td>Nov 16 - 17</td></tr>
+<tr><td>11</td><td>Type Qualifiers and Fixed-Width Types</td><td>B. Embedded C</td><td>Nov 18</td></tr>
+<tr><td>12</td><td>Memory Layout, Startup Code, Padding and Endianness</td><td>B. Embedded C</td><td>Nov 19</td></tr>
+<tr><td>13</td><td>Registers, Memory-Mapped I/O and Function Pointers</td><td>B. Embedded C</td><td>Nov 20</td></tr>
+<tr><td>14</td><td>GPIO and Debouncing</td><td>B. Embedded C</td><td>Nov 23</td></tr>
+<tr><td>15</td><td>Interrupts and ISR</td><td>B. Embedded C</td><td>Nov 24</td></tr>
+<tr><td>16</td><td>Timers, PWM and ADC</td><td>B. Embedded C</td><td>Nov 25 - 26</td></tr>
+<tr><td>17</td><td>Communication Protocols: UART, I2C and SPI</td><td>B. Embedded C</td><td>Nov 26 - 27</td></tr>
+<tr><td>18</td><td>Embedded Design Patterns</td><td>B. Embedded C</td><td>Nov 28 - 29</td></tr>
+</table></div>
+<p><em>The dates match the daily calendar from your study plan. If you fall behind, move the topic to the next weekend; do not skip it.</em></p>
+<p><strong>TOPIC 1</strong></p>
+<h1 id="basics-and-data-types">Basics and Data Types</h1>
+<aside class="callout info" style="--c:#2A7F8E"><p><strong>In one line</strong></p>
+<p>A C program is translated by the compiler into machine code; every variable has a data type that decides its size, how its bits are read and what you can do with it.</p></aside>
+<h2 id="1-1-how-a-c-program-becomes-a-running-program">1.1 How a C program becomes a running program</h2>
+<p>You write text (source code). The computer only understands machine code. Four tools turn one into the other, like a factory line.</p>
+<div class="tablewrap"><table>
+<tr><th><strong>Stage</strong></th><th><strong>Tool</strong></th><th><strong>What it does</strong></th></tr>
+<tr><td>1. Preprocess</td><td>Preprocessor</td><td>Handles lines starting with # (include files, replace macros)</td></tr>
+<tr><td>2. Compile</td><td>Compiler</td><td>Turns C into assembly and checks syntax</td></tr>
+<tr><td>3. Assemble</td><td>Assembler</td><td>Turns assembly into an object file (machine code pieces)</td></tr>
+<tr><td>4. Link</td><td>Linker</td><td>Joins object files and libraries into one executable</td></tr>
+</table></div>
+<pre class="code"><code>// hello.c
+#include &lt;stdio.h&gt;
+ 
+int main(void) {
+    printf("Hello, embedded world!\n");
+    return 0;
+}</code></pre>
+<p><strong>Output:</strong></p>
+<pre class="code"><code>Hello, embedded world!</code></pre>
+<p>Compile and run on a PC: gcc hello.c -o hello   then   ./hello</p>
+<ul>
+<li>#include &lt;stdio.h&gt; pastes the declarations of printf and scanf into your file.</li>
+<li>main is where every C program starts. return 0 tells the operating system "success".</li>
+<li>Every statement ends with a semicolon. Blocks use curly braces { }.</li>
+<li>On a microcontroller the same stages happen, but the result is flashed into the chip instead of run on the PC.</li>
+</ul>
+<h2 id="1-2-variables-and-constants">1.2 Variables and constants</h2>
+<p>A variable is a named box in memory. You choose the name, the compiler chooses the address.</p>
+<ul>
+<li>Names can use letters, digits and underscore, and cannot start with a digit. count1 is fine, 1count is not.</li>
+<li>C is case sensitive: Total and total are different variables.</li>
+<li>You cannot use keywords (int, return, while...) as names.</li>
+<li>Use meaningful names: temperature_c is better than t.</li>
+</ul>
+<pre class="code"><code>int age = 20;                 // variable: value can change
+const float PI = 3.14159f;    // constant: compiler blocks changes
+#define MAX_USERS 50          // macro: text replaced before compiling
+ 
+age = 21;       // fine
+// PI = 3.14;   // ERROR: assignment of read-only variable</code></pre>
+<h2 id="1-3-what-is-a-data-type">1.3 What is a data type?</h2>
+<p>A data type tells the compiler (1) how much memory to reserve, (2) how to read the bits stored there, and (3) which operations are allowed.</p>
+<aside class="callout info" style="--c:#2A7F8E"><p><strong>Analogy: boxes with labels</strong></p>
+<p>Memory is a warehouse of boxes. The type is the box size plus a label. The bits 01000001 mean the number 65 if the label says int, and the letter A if the label says char.</p></aside>
+<div class="tablewrap"><table>
+<tr><th><strong>Type</strong></th><th><strong>Size (PC)</strong></th><th><strong>Range / precision</strong></th><th><strong>Format</strong></th><th><strong>Use</strong></th></tr>
+<tr><td><code>char</code></td><td>1 byte</td><td>-128 to 127 (or 0 to 255)</td><td>%c %d</td><td>One character, small number</td></tr>
+<tr><td><code>short</code></td><td>2 bytes</td><td>-32,768 to 32,767</td><td>%hd</td><td>Small whole numbers</td></tr>
+<tr><td><code>int</code></td><td>4 bytes</td><td>-2.1 billion to 2.1 billion</td><td>%d</td><td>Whole numbers</td></tr>
+<tr><td><code>long long</code></td><td>8 bytes</td><td>about +/- 9.2 x 10^18</td><td>%lld</td><td>Very large whole numbers</td></tr>
+<tr><td><code>float</code></td><td>4 bytes</td><td>6 to 7 digits</td><td>%f</td><td>Decimals</td></tr>
+<tr><td><code>double</code></td><td>8 bytes</td><td>15 to 16 digits</td><td>%lf</td><td>Precise decimals</td></tr>
+<tr><td><code>void</code></td><td>-</td><td>no value</td><td>-</td><td>No return value, generic pointer</td></tr>
+</table></div>
+<aside class="callout info" style="--c:#2A7F8E"><p><strong>Important for embedded</strong></p>
+<p>The size of int is not fixed. It is 2 bytes on an Arduino Uno and 4 bytes on ESP32, ESP8266 and STM32. Embedded code uses uint8_t, uint16_t, uint32_t (see Topic 11).</p></aside>
+<h2 id="1-4-int-in-short">1.4 int in short</h2>
+<ul>
+<li>Stores whole numbers. A signed 32-bit int covers -2,147,483,648 to 2,147,483,647.</li>
+<li>Negative numbers are stored in two's complement: invert the bits of the positive number and add 1.</li>
+<li>Unsigned overflow wraps around (255 + 1 becomes 0 in 8 bits). Signed overflow is undefined behaviour.</li>
+<li>7 / 2 is 3 (decimals are dropped) and 7 % 2 is 1 (remainder).</li>
+<li>The full int chapter is in the separate document "Data Types in C with int Explained".</li>
+</ul>
+<h2 id="1-5-char-float-and-double">1.5 char, float and double</h2>
+<ul>
+<li>char stores a character as its ASCII number: 'A' = 65, 'a' = 97, '0' = 48. So 'A' + 1 is 66 which prints as B.</li>
+<li>float and double store numbers in binary scientific form (IEEE 754), so many decimals are approximate. 0.1 cannot be stored exactly.</li>
+<li>Do not compare floats with ==. Compare the difference with a small tolerance.</li>
+<li>Many small microcontrollers have no floating-point hardware, so float maths is slow. Use integers when you can (store 25.5 degrees as 255 tenths).</li>
+</ul>
+<pre class="code"><code>char  ch = 'A';
+float f  = 0.1f + 0.2f;
+ 
+printf("%c %d\n", ch, ch);      // A 65
+printf("%c\n", ch + 1);          // B
+printf("%.10f\n", f);            // 0.3000000119 (not exactly 0.3)
+printf("%zu\n", sizeof(double)); // 8</code></pre>
+<h2 id="1-6-input-and-output-printf-and-scanf">1.6 Input and output: printf and scanf</h2>
+<div class="tablewrap"><table>
+<tr><th><strong>Specifier</strong></th><th><strong>Type</strong></th><th><strong>Example</strong></th></tr>
+<tr><td><code>%d</code></td><td>int</td><td>printf("%d", 25);</td></tr>
+<tr><td><code>%u</code></td><td>unsigned int</td><td>printf("%u", 4000000000U);</td></tr>
+<tr><td><code>%ld  %lld</code></td><td>long, long long</td><td>printf("%lld", big);</td></tr>
+<tr><td><code>%f  %lf</code></td><td>float, double</td><td>printf("%.2f", 3.14159);  prints 3.14</td></tr>
+<tr><td><code>%c</code></td><td>char</td><td>printf("%c", 'A');</td></tr>
+<tr><td><code>%s</code></td><td>string</td><td>printf("%s", "hello");</td></tr>
+<tr><td><code>%x  %X</code></td><td>hexadecimal</td><td>printf("%x", 255);  prints ff</td></tr>
+<tr><td><code>%p</code></td><td>pointer address</td><td>printf("%p", (void *)&amp;x);</td></tr>
+</table></div>
+<pre class="code"><code>int a;
+float b;
+printf("Enter an int and a float: ");
+scanf("%d %f", &amp;a, &amp;b);          // note the &amp; before each variable
+printf("You typed %d and %.2f\n", a, b);</code></pre>
+<h2 id="1-7-type-casting">1.7 Type casting</h2>
+<pre class="code"><code>int total = 7, count = 2;
+float wrong = total / count;          // 3.0   (integer division first)
+float right = (float)total / count;   // 3.5   (cast before dividing)
+int x = (int)3.99;                    // 3     (cut, not rounded)</code></pre>
+<h2 id="common-mistakes">Common mistakes</h2>
+<div class="tablewrap"><table>
+<tr><th><strong>Mistake</strong></th><th><strong>Fix</strong></th></tr>
+<tr><td>Using a variable before giving it a value</td><td>Initialise: int x = 0;</td></tr>
+<tr><td>Wrong format specifier (%d for a float)</td><td>Match the type; compiler warnings (-Wall) catch this</td></tr>
+<tr><td>Forgetting &amp; in scanf("%d", &amp;x)</td><td>scanf needs the address of the variable</td></tr>
+<tr><td>5 / 2 expecting 2.5</td><td>Use 5 / 2.0 or a cast</td></tr>
+<tr><td>Comparing floats with ==</td><td>Use fabs(a - b) &lt; 0.0001</td></tr>
+<tr><td>Missing semicolon or unmatched brace</td><td>Read the first compiler error; later errors are often side effects</td></tr>
+</table></div>
+<h2 id="practice-programs-type-each-one-yourself">Practice programs (type each one yourself)</h2>
+<ol>
+<li>Print the size of every basic type on your computer.</li>
+<li>Read two numbers and print sum, difference, product and quotient (as decimals).</li>
+<li>Convert temperature from Celsius to Fahrenheit: F = C x 9/5 + 32 (watch integer division).</li>
+<li>Read a character and print its ASCII value, then print the next character.</li>
+<li>Show that 0.1 + 0.2 is not exactly 0.3 by printing 15 decimal places.</li>
+<li>Compile with gcc -Wall and fix every warning in your programs.</li>
+</ol>
+<h2 id="interview-questions-with-short-answers">Interview questions with short answers</h2>
+<p><strong>Q1. What is a data type? It defines the size, interpretation and allowed operations of a variable.</strong></p>
+<p><strong>Q2. What are the stages of compilation? Preprocessing, compiling, assembling, linking.</strong></p>
+<p><strong>Q3. Difference between const and #define? const creates a typed variable that the compiler protects; #define is plain text replacement before compiling and has no type.</strong></p>
+<p><strong>Q4. Why is sizeof(int) not always 4? The standard only sets a minimum (16 bits); the real size depends on the processor and compiler.</strong></p>
+<p><strong>Q5. What does void main() vs int main() mean? The standard form is int main(void), returning a status to the OS. void main is non-standard on hosted systems, though common in bare-metal code.</strong></p>
+<p><strong>TOPIC 2</strong></p>
+<h1 id="operators-and-control-flow">Operators and Control Flow</h1>
+<aside class="callout info" style="--c:#2A7F8E"><p><strong>In one line</strong></p>
+<p>Operators calculate and compare values; control flow (if, switch, loops) decides which code runs and how many times.</p></aside>
+<h2 id="2-1-operators">2.1 Operators</h2>
+<div class="tablewrap"><table>
+<tr><th><strong>Group</strong></th><th><strong>Operators</strong></th><th><strong>Notes</strong></th></tr>
+<tr><td>Arithmetic</td><td><code>+  -  *  /  %</code></td><td>% works only on integers</td></tr>
+<tr><td>Relational</td><td><code>==  !=  &lt;  &gt;  &lt;=  &gt;=</code></td><td>Result is 1 (true) or 0 (false)</td></tr>
+<tr><td>Logical</td><td><code>&amp;&amp;  ||  !</code></td><td>AND, OR, NOT</td></tr>
+<tr><td>Assignment</td><td><code>=  +=  -=  *=  /=  %=</code></td><td>x += 5 means x = x + 5</td></tr>
+<tr><td>Increment</td><td><code>++  --</code></td><td>Add or subtract 1</td></tr>
+<tr><td>Ternary</td><td><code>cond ? a : b</code></td><td>Short if-else that gives a value</td></tr>
+<tr><td>Bitwise</td><td><code>&amp;  |  ^  ~  &lt;&lt;  &gt;&gt;</code></td><td>Covered in Topic 10</td></tr>
+<tr><td>sizeof</td><td><code>sizeof(x)</code></td><td>Size in bytes</td></tr>
+</table></div>
+<p>In C, zero means false and any non-zero value means true.</p>
+<h2 id="2-2-pre-increment-vs-post-increment">2.2 Pre-increment vs post-increment</h2>
+<pre class="code"><code>int a = 5, b;
+b = a++;   // use a first (b = 5), then add 1 (a = 6)
+printf("%d %d\n", a, b);
+ 
+a = 5;
+b = ++a;   // add 1 first (a = 6), then use it (b = 6)
+printf("%d %d\n", a, b);</code></pre>
+<p><strong>Output:</strong></p>
+<pre class="code"><code>6 5
+6 6</code></pre>
+<h2 id="2-3-short-circuit-evaluation">2.3 Short-circuit evaluation</h2>
+<p>With &amp;&amp; and ||, C stops as soon as the answer is known. In (a != 0 &amp;&amp; 10 / a &gt; 2), if a is 0 the division is never evaluated, so there is no crash. Use this deliberately to guard risky checks.</p>
+<aside class="callout warn" style="--c:#C0392B"><p><strong>The classic bug: = versus ==</strong></p>
+<p>if (x = 5) assigns 5 to x and is always true. You wanted if (x == 5). A habit that helps: write if (5 == x) so a typo becomes a compile error.</p></aside>
+<h2 id="2-4-operator-precedence-high-to-low">2.4 Operator precedence (high to low)</h2>
+<ol>
+<li>Brackets ( ), array [ ], member . and -&gt;</li>
+<li>Unary: ! ~ ++ -- * (dereference) &amp; (address) sizeof</li>
+<li>* / %   then   + -</li>
+<li>&lt;&lt; &gt;&gt;   then   &lt; &lt;= &gt; &gt;=   then   == !=</li>
+<li>&amp;   then   ^   then   |   then   &amp;&amp;   then   ||</li>
+<li>?:   then   = and compound assignments</li>
+</ol>
+<p>When in doubt, use brackets. They cost nothing and remove the guesswork.</p>
+<h2 id="2-5-decision-making-if-else-if-else">2.5 Decision making: if, else if, else</h2>
+<pre class="code"><code>int marks = 72;
+ 
+if (marks &gt;= 90)       printf("Grade A\n");
+else if (marks &gt;= 75)  printf("Grade B\n");
+else if (marks &gt;= 60)  printf("Grade C\n");
+else                   printf("Fail\n");
+ 
+int max = (a &gt; b) ? a : b;     // ternary</code></pre>
+<p><strong>Output:</strong></p>
+<pre class="code"><code>Grade C</code></pre>
+<h2 id="2-6-switch">2.6 switch</h2>
+<p>Use switch when one integer or char variable is compared with many fixed values. break ends the case; without it, execution falls through into the next case.</p>
+<pre class="code"><code>char op = '*';
+int a = 6, b = 3;
+ 
+switch (op) {
+    case '+': printf("%d\n", a + b); break;
+    case '-': printf("%d\n", a - b); break;
+    case '*': printf("%d\n", a * b); break;
+    case '/': printf("%d\n", a / b); break;
+    default:  printf("Unknown operator\n");
+}</code></pre>
+<p><strong>Output:</strong></p>
+<pre class="code"><code>18</code></pre>
+<h2 id="2-7-loops">2.7 Loops</h2>
+<div class="tablewrap"><table>
+<tr><th><strong>Loop</strong></th><th><strong>Form</strong></th><th><strong>Use when</strong></th></tr>
+<tr><td>for</td><td><code>for (init; condition; update)</code></td><td>You know the number of repeats</td></tr>
+<tr><td>while</td><td><code>while (condition) { ... }</code></td><td>Repeat until something happens; may run 0 times</td></tr>
+<tr><td>do-while</td><td><code>do { ... } while (condition);</code></td><td>Must run at least once (menus, input checks)</td></tr>
+</table></div>
+<pre class="code"><code>for (int i = 1; i &lt;= 5; i++)
+    printf("%d ", i);                // 1 2 3 4 5
+ 
+int n = 1234, sum = 0;
+while (n &gt; 0) {
+    sum += n % 10;                   // take last digit
+    n /= 10;                         // drop last digit
+}
+printf("\nDigit sum = %d\n", sum);   // 10
+ 
+while (1) {                          // infinite loop: the main loop of
+    /* read sensors, update outputs */   // almost every embedded program
+}</code></pre>
+<ul>
+<li>break leaves the loop immediately. continue skips the rest of this round and goes to the next.</li>
+<li>Embedded programs normally end with an infinite loop because there is no operating system to return to.</li>
+</ul>
+<h2 id="2-8-nested-loops-patterns">2.8 Nested loops: patterns</h2>
+<pre class="code"><code>for (int i = 1; i &lt;= 4; i++) {          // rows
+    for (int j = 1; j &lt;= i; j++)        // stars in this row
+        printf("* ");
+    printf("\n");
+}</code></pre>
+<p><strong>Output:</strong></p>
+<pre class="code"><code>* 
+* * 
+* * * 
+* * * *</code></pre>
+<p>Trace it by hand: for row 1 the inner loop runs 1 time, row 2 runs 2 times, and so on. Tracing on paper is the best way to understand loops.</p>
+<h2 id="common-mistakes-2">Common mistakes</h2>
+<div class="tablewrap"><table>
+<tr><th><strong>Mistake</strong></th><th><strong>Fix</strong></th></tr>
+<tr><td>Using = instead of == in a condition</td><td>Compare with ==; compile with -Wall</td></tr>
+<tr><td>Semicolon after if or for: if (x &gt; 3); { }</td><td>Remove the stray semicolon; the block then belongs to the if</td></tr>
+<tr><td>Forgetting break in a switch</td><td>Add break unless fall-through is intentional (and comment it)</td></tr>
+<tr><td>Off-by-one: i &lt;= n when array size is n</td><td>Array indexes go from 0 to n-1, so use i &lt; n</td></tr>
+<tr><td>Infinite loop because the variable is never updated</td><td>Check that the condition can become false</td></tr>
+<tr><td>Comparing floats in loop conditions</td><td>Loop on integers, convert to float inside</td></tr>
+</table></div>
+<h2 id="practice-programs-type-each-one-yourself-2">Practice programs (type each one yourself)</h2>
+<ol>
+<li>Check whether a year is a leap year (divisible by 4, but century years only if divisible by 400).</li>
+<li>Build a calculator with switch for + - * / and guard against division by zero.</li>
+<li>Print the multiplication table of a number read from the user.</li>
+<li>Check whether a number is prime.</li>
+<li>Reverse the digits of a number and check for palindrome.</li>
+<li>Print a right-angled triangle and a pyramid of stars.</li>
+<li>Print the Fibonacci series up to n terms.</li>
+<li>Find the largest of three numbers using the ternary operator.</li>
+</ol>
+<h2 id="interview-questions-with-short-answers-2">Interview questions with short answers</h2>
+<p><strong>Q1. Difference between ++a and a++? Pre-increment adds 1 then uses the value; post-increment uses the value then adds 1.</strong></p>
+<p><strong>Q2. Difference between while and do-while? do-while checks the condition after the body, so it always runs at least once.</strong></p>
+<p><strong>Q3. What is short-circuit evaluation? In a &amp;&amp; b, b is skipped if a is false; in a || b, b is skipped if a is true.</strong></p>
+<p><strong>Q4. What happens if you forget break in switch? Execution falls through into the next case.</strong></p>
+<p><strong>Q5. Why do embedded programs use while(1)? There is no OS to return to, so main loops forever handling tasks.</strong></p>
+<p><strong>TOPIC 3</strong></p>
+<h1 id="functions-and-recursion">Functions and Recursion</h1>
+<aside class="callout info" style="--c:#2A7F8E"><p><strong>In one line</strong></p>
+<p>A function is a named block of code you write once and call many times; recursion is a function that calls itself to solve a smaller version of the same problem.</p></aside>
+<h2 id="3-1-why-functions">3.1 Why functions?</h2>
+<ul>
+<li>Reuse: write once, call anywhere.</li>
+<li>Readability: main() reads like a story (read_sensor(), update_display()).</li>
+<li>Testing: test small pieces separately.</li>
+<li>Teamwork: each engineer writes different functions (drivers).</li>
+</ul>
+<aside class="callout info" style="--c:#2A7F8E"><p><strong>Analogy: a recipe card</strong></p>
+<p>The function is the recipe. The parameters are the ingredients you hand over. The return value is the dish you get back. Calling the function is cooking from that card.</p></aside>
+<h2 id="3-2-anatomy-of-a-function">3.2 Anatomy of a function</h2>
+<pre class="code"><code>#include &lt;stdio.h&gt;
+ 
+int add(int a, int b);          // prototype (declaration)
+ 
+int main(void) {
+    int result = add(3, 4);     // call
+    printf("%d\n", result);
+    return 0;
+}
+ 
+int add(int a, int b) {         // definition
+    return a + b;
+}</code></pre>
+<p><strong>Output:</strong></p>
+<pre class="code"><code>7</code></pre>
+<div class="tablewrap"><table>
+<tr><th><strong>Part</strong></th><th><strong>Meaning</strong></th></tr>
+<tr><td>Return type</td><td>Type of the value sent back (int, float, void if nothing)</td></tr>
+<tr><td>Name</td><td>How you call it. Use verb-like names: read_adc, set_led</td></tr>
+<tr><td>Parameters</td><td>Inputs; types must be written for each one</td></tr>
+<tr><td>Prototype</td><td>Tells the compiler about the function before it is used. Goes at the top or in a header file</td></tr>
+<tr><td>return</td><td>Ends the function and hands back a value</td></tr>
+</table></div>
+<h2 id="3-3-call-by-value">3.3 Call by value</h2>
+<p>C passes copies of the arguments. Changing the parameter inside the function does not change the original variable.</p>
+<pre class="code"><code>void bad_swap(int a, int b) {
+    int t = a;  a = b;  b = t;     // swaps only the copies
+}
+ 
+int x = 1, y = 2;
+bad_swap(x, y);
+printf("%d %d\n", x, y);           // still 1 2</code></pre>
+<p><strong>Output:</strong></p>
+<pre class="code"><code>1 2</code></pre>
+<p>To change the original you pass its address (a pointer). That is the swap fix in Topic 5.</p>
+<h2 id="3-4-scope-and-lifetime">3.4 Scope and lifetime</h2>
+<div class="tablewrap"><table>
+<tr><th><strong>Kind</strong></th><th><strong>Where declared</strong></th><th><strong>Lives</strong></th></tr>
+<tr><td>Local</td><td>Inside a function or block</td><td>Created on entry, destroyed on exit (stack)</td></tr>
+<tr><td>Global</td><td>Outside all functions</td><td>Whole program run (data memory)</td></tr>
+<tr><td>static local</td><td>Inside a function with static</td><td>Whole program, visible only in that function</td></tr>
+</table></div>
+<p>Prefer local variables. Too many globals make code hard to debug, because any function can change them. In embedded code, globals shared with an ISR must be volatile (Topic 11).</p>
+<h2 id="3-5-recursion">3.5 Recursion</h2>
+<p>A recursive function must have (1) a base case that stops the recursion and (2) a recursive case that moves toward the base case.</p>
+<pre class="code"><code>unsigned long factorial(unsigned int n) {
+    if (n &lt;= 1)                    // base case
+        return 1;
+    return n * factorial(n - 1);   // recursive case
+}</code></pre>
+<p>Trace of factorial(4) (calls go down, answers come back up):</p>
+<div class="tablewrap"><table>
+<tr><th><strong>Call</strong></th><th><strong>Waits for</strong></th><th><strong>Returns</strong></th></tr>
+<tr><td><code>factorial(4)</code></td><td>4 * factorial(3)</td><td>24</td></tr>
+<tr><td><code>factorial(3)</code></td><td>3 * factorial(2)</td><td>6</td></tr>
+<tr><td><code>factorial(2)</code></td><td>2 * factorial(1)</td><td>2</td></tr>
+<tr><td><code>factorial(1)</code></td><td>base case</td><td>1</td></tr>
+</table></div>
+<h2 id="3-6-what-happens-in-memory-the-stack">3.6 What happens in memory: the stack</h2>
+<p>Every call pushes a stack frame (parameters, local variables, return address). When the function returns, the frame is removed. Deep recursion means many frames; run out of stack and the program crashes (stack overflow).</p>
+<aside class="callout warn" style="--c:#C0392B"><p><strong>Recursion on microcontrollers</strong></p>
+<p>An ESP8266 or Uno has very little RAM and stack. Many embedded coding standards (MISRA) forbid recursion. Prefer loops in firmware; use recursion to learn and in tree or parsing problems on PCs.</p></aside>
+<pre class="code"><code>int fib(int n) {                 // easy to read, but slow: it repeats work
+    if (n &lt; 2) return n;
+    return fib(n - 1) + fib(n - 2);
+}
+ 
+int fib_loop(int n) {            // fast and uses constant stack
+    int a = 0, b = 1;
+    for (int i = 0; i &lt; n; i++) { int t = a + b; a = b; b = t; }
+    return a;
+}</code></pre>
+<h2 id="3-7-splitting-code-into-files-header-files">3.7 Splitting code into files (header files)</h2>
+<pre class="code"><code>// mathutil.h
+#ifndef MATHUTIL_H
+#define MATHUTIL_H
+int add(int a, int b);
+int max(int a, int b);
+#endif
+ 
+// mathutil.c
+#include "mathutil.h"
+int add(int a, int b) { return a + b; }
+int max(int a, int b) { return a &gt; b ? a : b; }
+ 
+// main.c
+#include &lt;stdio.h&gt;
+#include "mathutil.h"
+int main(void) { printf("%d\n", add(2, 3)); return 0; }</code></pre>
+<p>Build: gcc main.c mathutil.c -o app. The header is the public menu; the .c file is the kitchen.</p>
+<h2 id="common-mistakes-3">Common mistakes</h2>
+<div class="tablewrap"><table>
+<tr><th><strong>Mistake</strong></th><th><strong>Fix</strong></th></tr>
+<tr><td>Calling a function before declaring it</td><td>Add a prototype or move the definition above main</td></tr>
+<tr><td>Expecting a function to modify the caller's variable</td><td>Pass a pointer</td></tr>
+<tr><td>Missing base case in recursion</td><td>Write the base case first</td></tr>
+<tr><td>Returning the address of a local variable</td><td>Local memory disappears on return; use static or let the caller pass a buffer</td></tr>
+<tr><td>Not returning a value from a non-void function</td><td>Every path must return</td></tr>
+<tr><td>Function with empty () thinking it means no arguments</td><td>Write (void) to say no arguments</td></tr>
+</table></div>
+<h2 id="practice-programs-type-each-one-yourself-3">Practice programs (type each one yourself)</h2>
+<ol>
+<li>Write max, min, power(base, exp), gcd and is_prime as separate functions.</li>
+<li>Write factorial both with a loop and with recursion; compare the results for n = 1 to 12.</li>
+<li>Write sum_digits(n) recursively.</li>
+<li>Print decimal to binary using recursion.</li>
+<li>Write a function that returns the average of an array (pass array and size).</li>
+<li>Split your calculator into main.c, calc.c and calc.h.</li>
+</ol>
+<h2 id="interview-questions-with-short-answers-3">Interview questions with short answers</h2>
+<p><strong>Q1. What is call by value? The function receives copies of the arguments, so changes do not affect the originals.</strong></p>
+<p><strong>Q2. Difference between declaration and definition? A declaration tells the compiler the signature; the definition provides the body.</strong></p>
+<p><strong>Q3. What is a stack frame? The block of stack memory holding a call's parameters, locals and return address.</strong></p>
+<p><strong>Q4. What is the base case in recursion? The condition where the function stops calling itself.</strong></p>
+<p><strong>Q5. Why avoid recursion in firmware? Stack is small and usage is hard to predict; overflow causes a crash that is hard to debug.</strong></p>
+<p><strong>Q6. What does static do to a local variable? It keeps its value between calls and lives for the whole program.</strong></p>
+<p><strong>TOPIC 4</strong></p>
+<h1 id="arrays-and-strings">Arrays and Strings</h1>
+<aside class="callout info" style="--c:#2A7F8E"><p><strong>In one line</strong></p>
+<p>An array is a row of same-type variables stored side by side in memory; a string in C is simply a char array that ends with the null character '\0'.</p></aside>
+<h2 id="4-1-one-dimensional-arrays">4.1 One-dimensional arrays</h2>
+<aside class="callout info" style="--c:#2A7F8E"><p><strong>Analogy: a row of lockers</strong></p>
+<p>Lockers are numbered 0, 1, 2... All lockers are the same size and sit next to each other. The array name is the building; the index picks the locker.</p></aside>
+<pre class="code"><code>int marks[5] = {90, 85, 70, 60, 95};     // 5 ints, 20 bytes on a 32-bit int system
+int zeros[5] = {0};                      // all zeros
+int auto_size[] = {1, 2, 3};             // compiler counts: size 3
+ 
+printf("%d\n", marks[0]);                // 90  (first element)
+printf("%d\n", marks[4]);                // 95  (last element)
+ 
+for (int i = 0; i &lt; 5; i++)
+    printf("%d ", marks[i]);
+ 
+int n = sizeof(marks) / sizeof(marks[0]);   // number of elements = 5</code></pre>
+<ul>
+<li>Indexes run from 0 to size-1. An array of 5 has marks[0] to marks[4].</li>
+<li>Elements sit in consecutive memory: address of marks[1] = address of marks[0] + sizeof(int).</li>
+<li>C does not check bounds. marks[10] compiles and corrupts other memory or crashes: undefined behaviour.</li>
+<li>Without an initialiser, a local array holds garbage values.</li>
+</ul>
+<h2 id="4-2-two-dimensional-arrays">4.2 Two-dimensional arrays</h2>
+<pre class="code"><code>int m[2][3] = { {1, 2, 3},
+                {4, 5, 6} };            // 2 rows, 3 columns
+ 
+for (int r = 0; r &lt; 2; r++) {
+    for (int c = 0; c &lt; 3; c++)
+        printf("%d ", m[r][c]);
+    printf("\n");
+}</code></pre>
+<p><strong>Output:</strong></p>
+<pre class="code"><code>1 2 3 
+4 5 6</code></pre>
+<p>Memory is one long line; C stores rows one after another (row-major). So m[1][0] sits right after m[0][2].</p>
+<h2 id="4-3-passing-arrays-to-functions">4.3 Passing arrays to functions</h2>
+<p>An array passed to a function becomes a pointer to its first element, so the function can change the original. The size is lost, so pass it separately.</p>
+<pre class="code"><code>void print_array(const int arr[], int n) {      // const: we only read it
+    for (int i = 0; i &lt; n; i++)
+        printf("%d ", arr[i]);
+}
+ 
+int find_max(const int arr[], int n) {
+    int max = arr[0];
+    for (int i = 1; i &lt; n; i++)
+        if (arr[i] &gt; max) max = arr[i];
+    return max;
+}</code></pre>
+<h2 id="4-4-searching-and-sorting">4.4 Searching and sorting</h2>
+<pre class="code"><code>// Bubble sort: repeatedly swap neighbours that are out of order
+void bubble_sort(int a[], int n) {
+    for (int i = 0; i &lt; n - 1; i++)
+        for (int j = 0; j &lt; n - 1 - i; j++)
+            if (a[j] &gt; a[j + 1]) {
+                int t = a[j];  a[j] = a[j + 1];  a[j + 1] = t;
+            }
+}</code></pre>
+<p>After pass 1 the largest element has "bubbled" to the end; after pass 2 the second largest is in place, and so on. Fine for learning; real code uses qsort or better algorithms.</p>
+<h2 id="4-5-strings">4.5 Strings</h2>
+<p>C has no string type. A string is a char array whose last element is '\0' (the null terminator, value 0). Functions find the end of the string by looking for it.</p>
+<pre class="code"><code>char s1[] = "hello";               // size 6: h e l l o \0
+char s2[10] = "hi";                // h i \0 and 7 more zeros
+char s3[] = {'o', 'k', '\0'};      // same idea, written by hand
+ 
+printf("%s\n", s1);                // hello
+printf("%zu\n", sizeof(s1));       // 6  (array size)
+printf("%zu\n", strlen(s1));       // 5  (characters before \0)</code></pre>
+<div class="tablewrap"><table>
+<tr><th><strong>Function (string.h)</strong></th><th><strong>What it does</strong></th></tr>
+<tr><td><code>strlen(s)</code></td><td>Number of characters, not counting \0</td></tr>
+<tr><td><code>strcpy(dst, src)</code></td><td>Copies src into dst (dst must be big enough!)</td></tr>
+<tr><td><code>strncpy(dst, src, n)</code></td><td>Safer copy with a limit; may not add \0, so add it yourself</td></tr>
+<tr><td><code>strcmp(a, b)</code></td><td>Returns 0 if equal, negative if a &lt; b, positive if a &gt; b</td></tr>
+<tr><td><code>strcat(dst, src)</code></td><td>Appends src to the end of dst</td></tr>
+<tr><td><code>strchr(s, c)</code></td><td>Pointer to first occurrence of c, or NULL</td></tr>
+<tr><td><code>strstr(s, sub)</code></td><td>Pointer to first occurrence of sub, or NULL</td></tr>
+</table></div>
+<aside class="callout warn" style="--c:#C0392B"><p><strong>Never compare strings with ==</strong></p>
+<p>if (a == b) compares addresses, not text. Use strcmp(a, b) == 0.</p></aside>
+<h2 id="4-6-reading-strings-safely">4.6 Reading strings safely</h2>
+<pre class="code"><code>char name[20];
+ 
+scanf("%19s", name);          // reads one word, max 19 chars (leaves room for \0)
+ 
+fgets(name, sizeof(name), stdin);    // reads a whole line including spaces
+name[strcspn(name, "\n")] = '\0';    // remove the newline fgets keeps</code></pre>
+<h2 id="4-7-writing-your-own-strlen-and-reverse">4.7 Writing your own strlen and reverse</h2>
+<pre class="code"><code>int my_strlen(const char *s) {
+    int n = 0;
+    while (s[n] != '\0') n++;
+    return n;
+}
+ 
+void reverse(char s[]) {
+    int i = 0, j = my_strlen(s) - 1;
+    while (i &lt; j) {
+        char t = s[i];  s[i] = s[j];  s[j] = t;
+        i++;  j--;
+    }
+}</code></pre>
+<p>Embedded note: serial commands, sensor names and display text are all strings. Always size buffers carefully: a UART buffer overflow can crash the device or corrupt memory.</p>
+<h2 id="common-mistakes-4">Common mistakes</h2>
+<div class="tablewrap"><table>
+<tr><th><strong>Mistake</strong></th><th><strong>Fix</strong></th></tr>
+<tr><td>Index out of range (arr[5] on size 5)</td><td>Loop with i &lt; size; validate indexes</td></tr>
+<tr><td>Forgetting the \0 slot: char s[5] = "hello";</td><td>Size must be 6, or leave it empty: char s[] = "hello";</td></tr>
+<tr><td>Comparing strings with ==</td><td>Use strcmp</td></tr>
+<tr><td>strcpy into a buffer that is too small</td><td>Check lengths or use snprintf / strncpy</td></tr>
+<tr><td>Using sizeof on an array parameter</td><td>It gives pointer size; pass the length</td></tr>
+<tr><td>Modifying a string literal: char *p = "hi"; p[0] = 'H';</td><td>Literals are read-only; use char p[] = "hi";</td></tr>
+</table></div>
+<h2 id="practice-programs-type-each-one-yourself-4">Practice programs (type each one yourself)</h2>
+<ol>
+<li>Find the maximum, minimum, sum and average of an array.</li>
+<li>Reverse an array in place.</li>
+<li>Sort an array with bubble sort and search with linear search.</li>
+<li>Add two 3x3 matrices, then find the transpose.</li>
+<li>Write your own strlen, strcpy, strcmp and strcat.</li>
+<li>Check whether a string is a palindrome and count its vowels.</li>
+<li>Count how many times each letter appears in a string (array of 26 counters).</li>
+<li>Read a sentence and print each word on a new line.</li>
+</ol>
+<h2 id="interview-questions-with-short-answers-4">Interview questions with short answers</h2>
+<p><strong>Q1. Why do arrays start at index 0? The index is an offset from the first element: address = base + index x size.</strong></p>
+<p><strong>Q2. What is the null terminator? The character '\0' (value 0) that marks the end of a C string.</strong></p>
+<p><strong>Q3. sizeof("hello") vs strlen("hello")? sizeof is 6 (includes \0); strlen is 5.</strong></p>
+<p><strong>Q4. Does C check array bounds? No. Out-of-range access is undefined behaviour.</strong></p>
+<p><strong>Q5. Difference between char s[] = "hi" and char *s = "hi"? The first is a modifiable array copy; the second points to a read-only literal.</strong></p>
+<p><strong>Q6. How is a 2D array stored in memory? Row by row, in one contiguous block (row-major order).</strong></p>
+<p><strong>TOPIC 5</strong></p>
+<h1 id="pointers">Pointers</h1>
+<aside class="callout info" style="--c:#2A7F8E"><p><strong>In one line</strong></p>
+<p>A pointer is a variable that stores the memory address of another variable. Pointers let functions change the caller's data, walk through arrays, and talk directly to hardware.</p></aside>
+<h2 id="5-1-the-idea">5.1 The idea</h2>
+<aside class="callout info" style="--c:#2A7F8E"><p><strong>Analogy: house and address</strong></p>
+<p>A variable is a house. Its value is the person living inside. The address is the house number written on a paper slip. A pointer is the slip of paper: it is not the house, it only tells you where the house is.</p></aside>
+<div class="tablewrap"><table>
+<tr><th><strong>Symbol</strong></th><th><strong>Meaning</strong></th></tr>
+<tr><td><code>&amp;x</code></td><td>Address of x ("where does x live?")</td></tr>
+<tr><td><code>int *p</code></td><td>Declare p as a pointer to an int</td></tr>
+<tr><td><code>*p</code></td><td>Dereference: go to the address stored in p and use the value there</td></tr>
+<tr><td><code>NULL</code></td><td>A pointer that points to nothing (address 0)</td></tr>
+</table></div>
+<pre class="code"><code>int x = 10;
+int *p = &amp;x;          // p holds the address of x
+ 
+printf("%d\n", x);    // 10
+printf("%p\n", (void *)p);   // address, for example 0x7ffd5c3a
+printf("%d\n", *p);   // 10  (value at that address)
+ 
+*p = 99;              // change x through the pointer
+printf("%d\n", x);    // 99</code></pre>
+<div class="tablewrap"><table>
+<tr><th><strong>Name</strong></th><th><strong>Address (example)</strong></th><th><strong>Value</strong></th><th><strong>Comment</strong></th></tr>
+<tr><td>x</td><td><code>0x1000</code></td><td><code>99</code></td><td>int variable</td></tr>
+<tr><td>p</td><td><code>0x1004</code></td><td><code>0x1000</code></td><td>pointer holding the address of x</td></tr>
+</table></div>
+<p>Draw this table on paper whenever pointers confuse you. Boxes with addresses and values explain almost every pointer question.</p>
+<h2 id="5-2-pointer-size">5.2 Pointer size</h2>
+<p>A pointer holds an address, so its size depends on the machine, not on what it points to: 8 bytes on 64-bit PCs, 4 bytes on ESP32, ESP8266 and ARM Cortex-M, 2 bytes on 8-bit AVR (Arduino Uno).</p>
+<h2 id="5-3-call-by-reference-the-swap-that-works">5.3 Call by reference: the swap that works</h2>
+<pre class="code"><code>void swap(int *a, int *b) {
+    int t = *a;
+    *a = *b;
+    *b = t;
+}
+ 
+int x = 1, y = 2;
+swap(&amp;x, &amp;y);
+printf("%d %d\n", x, y);    // 2 1</code></pre>
+<p><strong>Output:</strong></p>
+<pre class="code"><code>2 1</code></pre>
+<p>C still passes by value, but the value passed is an address, so the function can reach the original. Functions that must return more than one result also use pointers (output parameters).</p>
+<h2 id="5-4-pointer-arithmetic">5.4 Pointer arithmetic</h2>
+<p>Adding 1 to a pointer moves it by one element, not one byte. For int *p, p + 1 adds sizeof(int) to the address.</p>
+<pre class="code"><code>int arr[4] = {10, 20, 30, 40};
+int *p = arr;                 // array name = address of first element
+ 
+printf("%d\n", *p);           // 10
+printf("%d\n", *(p + 2));     // 30
+p++;                          // now points to arr[1]
+printf("%d\n", *p);           // 20
+ 
+// arr[i] is exactly the same as *(arr + i)</code></pre>
+<ul>
+<li>Allowed: pointer + integer, pointer - integer, pointer - pointer (same array), comparing pointers.</li>
+<li>Not allowed: adding two pointers, multiplying pointers.</li>
+<li>An array name is not a variable: you cannot write arr++ (but p++ is fine).</li>
+</ul>
+<h2 id="5-5-arrays-strings-and-pointers">5.5 Arrays, strings and pointers</h2>
+<pre class="code"><code>char *s = "embedded";           // points to a read-only literal
+int count = 0;
+while (*s != '\0') {            // walk until the terminator
+    count++;
+    s++;
+}
+printf("%d\n", count);          // 8</code></pre>
+<h2 id="5-6-pointer-to-pointer-void-pointer-null">5.6 Pointer to pointer, void pointer, NULL</h2>
+<ul>
+<li>int **pp = &amp;p; : pp points to p, which points to an int. **pp is the int. Used for 2D data and to let a function change a pointer.</li>
+<li>void *: a pointer with no type. It can hold any address but must be cast before use. malloc returns void *.</li>
+<li>NULL: always check a pointer against NULL before using it: if (p != NULL) { ... }.</li>
+</ul>
+<h2 id="5-7-const-and-pointers">5.7 const and pointers</h2>
+<div class="tablewrap"><table>
+<tr><th><strong>Declaration</strong></th><th><strong>Meaning (read right to left)</strong></th></tr>
+<tr><td><code>const int *p</code></td><td>p points to a constant int: cannot change *p, can move p</td></tr>
+<tr><td><code>int *const p</code></td><td>p is a constant pointer: cannot move p, can change *p</td></tr>
+<tr><td><code>const int *const p</code></td><td>Cannot change either</td></tr>
+</table></div>
+<p>Use const int *p for function parameters that only read data. It documents intent and the compiler enforces it.</p>
+<h2 id="5-8-function-pointers">5.8 Function pointers</h2>
+<p>A function also lives at an address. A function pointer stores it, so you can choose which function to call at run time (callbacks, state machines, driver tables).</p>
+<pre class="code"><code>int add(int a, int b) { return a + b; }
+int sub(int a, int b) { return a - b; }
+ 
+int (*op)(int, int);          // op = pointer to function(int,int) returning int
+ 
+op = add;
+printf("%d\n", op(5, 3));     // 8
+op = sub;
+printf("%d\n", op(5, 3));     // 2</code></pre>
+<p><strong>Output:</strong></p>
+<pre class="code"><code>8
+2</code></pre>
+<h2 id="5-9-dangerous-pointers">5.9 Dangerous pointers</h2>
+<div class="tablewrap"><table>
+<tr><th><strong>Kind</strong></th><th><strong>What it is</strong></th><th><strong>Result</strong></th></tr>
+<tr><td>Wild</td><td>Declared but never initialised: int *p;</td><td>Random address; crash or corruption</td></tr>
+<tr><td>Dangling</td><td>Points to memory that is gone (freed or out of scope)</td><td>Garbage or crash</td></tr>
+<tr><td>NULL dereference</td><td>*p when p is NULL</td><td>Crash (or silent fault on some MCUs)</td></tr>
+</table></div>
+<pre class="code"><code>int *bad(void) {
+    int local = 5;
+    return &amp;local;        // WRONG: local dies when the function returns
+}</code></pre>
+<p>Habit: initialise pointers to NULL, set to NULL after free, check before use.</p>
+<h2 id="common-mistakes-5">Common mistakes</h2>
+<div class="tablewrap"><table>
+<tr><th><strong>Mistake</strong></th><th><strong>Fix</strong></th></tr>
+<tr><td>Dereferencing an uninitialised or NULL pointer</td><td>Initialise, and check for NULL</td></tr>
+<tr><td>Returning the address of a local variable</td><td>Return a value, use static, or write into a caller-provided buffer</td></tr>
+<tr><td>Forgetting the &amp; when passing to a function that wants a pointer</td><td>swap(&amp;x, &amp;y), not swap(x, y)</td></tr>
+<tr><td>Confusing p, *p and &amp;p</td><td>Draw the box diagram: p is the slip, *p is the house, &amp;p is where the slip is kept</td></tr>
+<tr><td>Pointer arithmetic beyond the array</td><td>Stay within arr[0]..arr[n-1] (one past the end is allowed only for comparing)</td></tr>
+<tr><td>Writing through char *s = "text"</td><td>Use char s[] = "text" if you need to modify</td></tr>
+</table></div>
+<h2 id="practice-programs-type-each-one-yourself-5">Practice programs (type each one yourself)</h2>
+<ol>
+<li>Declare an int, a pointer to it, and print value, address and *p.</li>
+<li>Swap two numbers using pointers.</li>
+<li>Traverse an array using only pointer arithmetic (no square brackets).</li>
+<li>Write my_strlen and my_strcpy using pointers.</li>
+<li>Write a function that returns both min and max through pointer parameters.</li>
+<li>Reverse an array using two pointers (start and end).</li>
+<li>Use a function pointer to choose between add, sub, mul at run time (menu).</li>
+<li>Print sizeof of different pointer types and explain why they are equal.</li>
+</ol>
+<h2 id="interview-questions-with-short-answers-5">Interview questions with short answers</h2>
+<p><strong>Q1. What is a pointer? A variable that stores a memory address.</strong></p>
+<p><strong>Q2. Difference between * in a declaration and * in an expression? In int *p it means "p is a pointer"; in *p it means "the value at the address in p".</strong></p>
+<p><strong>Q3. What is a dangling pointer? A pointer to memory that has been freed or has gone out of scope.</strong></p>
+<p><strong>Q4. What is a void pointer? A generic pointer without a type; cast it before dereferencing.</strong></p>
+<p><strong>Q5. Difference between const int *p and int *const p? The first protects the data, the second protects the pointer itself.</strong></p>
+<p><strong>Q6. Why is arr[i] the same as *(arr + i)? The compiler defines indexing as pointer arithmetic: base address plus i elements.</strong></p>
+<p><strong>Q7. Where do you use function pointers in embedded code? Interrupt vector tables, callbacks, state machines and driver interfaces.</strong></p>
+<p><strong>TOPIC 6</strong></p>
+<h1 id="structures-unions-enums-and-typedef">Structures, Unions, Enums and typedef</h1>
+<aside class="callout info" style="--c:#2A7F8E"><p><strong>In one line</strong></p>
+<p>A struct groups different variables under one name, a union lets members share the same memory, an enum gives names to integer constants, and typedef gives a type a shorter name.</p></aside>
+<h2 id="6-1-structures">6.1 Structures</h2>
+<aside class="callout info" style="--c:#2A7F8E"><p><strong>Analogy: a form</strong></p>
+<p>An array is a stack of identical sheets. A struct is one form with different fields: name, roll number, marks. One form describes one student.</p></aside>
+<pre class="code"><code>struct Student {
+    char  name[20];
+    int   roll;
+    float marks;
+};
+ 
+struct Student s1 = {"Ravi", 101, 88.5f};
+struct Student s2;
+ 
+s2.roll = 102;                       // . accesses a member
+strcpy(s2.name, "Anu");
+s2.marks = 91.0f;
+ 
+printf("%s %d %.1f\n", s1.name, s1.roll, s1.marks);</code></pre>
+<p><strong>Output:</strong></p>
+<pre class="code"><code>Ravi 101 88.5</code></pre>
+<h2 id="6-2-pointers-to-structures-and-the-arrow-operator">6.2 Pointers to structures and the arrow operator</h2>
+<p>Structures can be large. Passing a pointer avoids copying the whole struct, and the function can modify the original. Use -&gt; with a pointer, . with a variable.</p>
+<pre class="code"><code>void print_student(const struct Student *s) {
+    printf("%s %d %.1f\n", s-&gt;name, s-&gt;roll, s-&gt;marks);   // same as (*s).name
+}
+ 
+void give_bonus(struct Student *s) {
+    s-&gt;marks += 5;
+}
+ 
+print_student(&amp;s1);
+give_bonus(&amp;s1);</code></pre>
+<h2 id="6-3-array-of-structures">6.3 Array of structures</h2>
+<pre class="code"><code>struct Student cls[3] = {
+    {"Ravi", 101, 88.5f},
+    {"Anu",  102, 91.0f},
+    {"Kiran",103, 79.0f}
+};
+ 
+for (int i = 0; i &lt; 3; i++)
+    printf("%d %s %.1f\n", cls[i].roll, cls[i].name, cls[i].marks);</code></pre>
+<h2 id="6-4-typedef-shorter-names">6.4 typedef: shorter names</h2>
+<pre class="code"><code>typedef struct {
+    float temperature;
+    float humidity;
+    uint32_t timestamp;
+} SensorData;
+ 
+SensorData reading = {27.5f, 60.0f, 1000};   // no need to write "struct"</code></pre>
+<p>typedef does not create a new type; it just gives a new name. It is used everywhere in embedded code: uint8_t itself is a typedef.</p>
+<h2 id="6-5-struct-padding-and-size">6.5 Struct padding and size</h2>
+<p>CPUs read memory fastest when a 4-byte int starts at an address divisible by 4. The compiler inserts unused padding bytes to keep members aligned, so sizeof(struct) can be bigger than the sum of its members.</p>
+<pre class="code"><code>struct A { char a; int b; char c; };   // a, 3 pad, b (4), c, 3 pad  -&gt; 12 bytes
+struct B { int b; char a; char c; };   // b (4), a, c, 2 pad          -&gt;  8 bytes
+ 
+printf("%zu %zu\n", sizeof(struct A), sizeof(struct B));   // 12 8</code></pre>
+<p><strong>Output:</strong></p>
+<pre class="code"><code>12 8</code></pre>
+<p>Tip: list members from largest to smallest to save RAM. This matters when you have thousands of records on a microcontroller.</p>
+<h2 id="6-6-unions">6.6 Unions</h2>
+<p>In a union all members start at the same address. The size is that of the largest member, and only one member holds a meaningful value at a time.</p>
+<pre class="code"><code>union Data {
+    int   i;
+    float f;
+    uint8_t bytes[4];
+};
+ 
+union Data d;
+d.f = 1.0f;
+printf("%02X %02X %02X %02X\n", d.bytes[0], d.bytes[1], d.bytes[2], d.bytes[3]);
+printf("%zu\n", sizeof(union Data));</code></pre>
+<p><strong>Output:</strong></p>
+<pre class="code"><code>00 00 80 3F
+4</code></pre>
+<p>The output shows the four bytes of the float 1.0 (0x3F800000) on a little-endian machine, lowest byte first. Embedded uses of unions: viewing a 32-bit register as bytes or as bit fields, and sending different message types in one buffer.</p>
+<div class="tablewrap"><table>
+<tr><th></th><th><strong>struct</strong></th><th><strong>union</strong></th></tr>
+<tr><td>Memory</td><td>Each member has its own space</td><td>Members share one space</td></tr>
+<tr><td>Size</td><td>Sum of members + padding</td><td>Size of the largest member</td></tr>
+<tr><td>Use</td><td>Group related data</td><td>Save memory, reinterpret the same bytes</td></tr>
+</table></div>
+<h2 id="6-7-enumerations">6.7 Enumerations</h2>
+<p>An enum gives readable names to integer constants. Values start at 0 and increase by 1 unless you set them.</p>
+<pre class="code"><code>enum Color { RED, GREEN, BLUE };            // 0, 1, 2
+enum State { IDLE = 10, RUNNING, ERROR };   // 10, 11, 12
+ 
+enum Color c = GREEN;
+if (c == GREEN) printf("green = %d\n", c);  // green = 1</code></pre>
+<p>Use enums for states in a state machine (Topic 18) instead of magic numbers like 0, 1, 2.</p>
+<h2 id="6-8-bit-fields">6.8 Bit-fields</h2>
+<pre class="code"><code>struct Flags {
+    unsigned int power   : 1;    // 1 bit
+    unsigned int mode    : 2;    // 2 bits (0 to 3)
+    unsigned int error   : 1;
+    unsigned int         : 4;    // 4 unused bits
+};
+ 
+struct Flags f = {0};
+f.power = 1;
+f.mode  = 2;</code></pre>
+<aside class="callout warn" style="--c:#C0392B"><p><strong>Bit-fields are not portable</strong></p>
+<p>The order of bits and the packing are decided by the compiler. For hardware registers and communication protocols, most engineers use masks and shifts (Topic 10) instead.</p></aside>
+<h2 id="common-mistakes-6">Common mistakes</h2>
+<div class="tablewrap"><table>
+<tr><th><strong>Mistake</strong></th><th><strong>Fix</strong></th></tr>
+<tr><td>Using . with a pointer (p.name)</td><td>Use -&gt; with pointers: p-&gt;name</td></tr>
+<tr><td>Forgetting the semicolon after the struct definition</td><td>struct X { ... };</td></tr>
+<tr><td>Comparing two structs with ==</td><td>Compare members one by one (or memcmp with care for padding)</td></tr>
+<tr><td>Assuming sizeof(struct) is the sum of members</td><td>Print sizeof; remember padding</td></tr>
+<tr><td>Reading a different union member than you wrote (expecting conversion)</td><td>A union reinterprets bytes; it does not convert values</td></tr>
+<tr><td>Assigning strings with = (s.name = "Ravi")</td><td>Use strcpy for char arrays</td></tr>
+</table></div>
+<h2 id="practice-programs-type-each-one-yourself-6">Practice programs (type each one yourself)</h2>
+<ol>
+<li>Create a Student struct, read 3 students and print the topper.</li>
+<li>Write a function that takes a pointer to struct and updates its marks.</li>
+<li>Print sizeof for the structs A and B above and explain the difference.</li>
+<li>Use a union to print the bytes of an int and decide if your machine is little or big endian.</li>
+<li>Make an enum for days of the week and print the name using a switch.</li>
+<li>Define typedef struct for a sensor reading and keep an array of 5 readings.</li>
+</ol>
+<h2 id="interview-questions-with-short-answers-6">Interview questions with short answers</h2>
+<p><strong>Q1. Difference between structure and union? Struct members have separate memory; union members share the same memory.</strong></p>
+<p><strong>Q2. What is structure padding? Unused bytes added so each member is aligned to its natural boundary for fast access.</strong></p>
+<p><strong>Q3. When do you use -&gt;? To access a member through a pointer to a structure.</strong></p>
+<p><strong>Q4. What is typedef? A way to give a new name to an existing type.</strong></p>
+<p><strong>Q5. How can you reduce the size of a struct? Order members from large to small, or use packed attribute (with a speed or portability cost).</strong></p>
+<p><strong>Q6. What is an enum used for? Named integer constants, mainly states and options.</strong></p>
+<p><strong>TOPIC 7</strong></p>
+<h1 id="dynamic-memory-allocation">Dynamic Memory Allocation</h1>
+<aside class="callout info" style="--c:#2A7F8E"><p><strong>In one line</strong></p>
+<p>Dynamic memory lets a program request memory from the heap while it runs (malloc) and must give it back (free). On small microcontrollers it is usually avoided.</p></aside>
+<h2 id="7-1-stack-vs-heap">7.1 Stack vs heap</h2>
+<div class="tablewrap"><table>
+<tr><th></th><th><strong>Stack</strong></th><th><strong>Heap</strong></th></tr>
+<tr><td>Managed by</td><td>Compiler (automatic)</td><td>You (malloc / free)</td></tr>
+<tr><td>Holds</td><td>Local variables, function calls</td><td>Memory you request at run time</td></tr>
+<tr><td>Size known</td><td>At compile time</td><td>Decided while running</td></tr>
+<tr><td>Speed</td><td>Very fast</td><td>Slower</td></tr>
+<tr><td>Freed</td><td>When the function returns</td><td>When you call free</td></tr>
+<tr><td>Risk</td><td>Stack overflow</td><td>Leaks, fragmentation, dangling pointers</td></tr>
+</table></div>
+<aside class="callout info" style="--c:#2A7F8E"><p><strong>Analogy: hotel rooms</strong></p>
+<p>Stack is your own room that is cleaned automatically when you leave. Heap is renting a hall: you ask the manager (malloc), use it as long as you like, and must hand the keys back (free). If you forget, nobody else can use that hall.</p></aside>
+<h2 id="7-2-the-four-functions-stdlib-h">7.2 The four functions (stdlib.h)</h2>
+<div class="tablewrap"><table>
+<tr><th><strong>Function</strong></th><th><strong>What it does</strong></th></tr>
+<tr><td><code>malloc(size)</code></td><td>Reserves size bytes; memory is NOT cleared; returns NULL on failure</td></tr>
+<tr><td><code>calloc(n, size)</code></td><td>Reserves n x size bytes and sets all to zero</td></tr>
+<tr><td><code>realloc(ptr, size)</code></td><td>Resizes a block (may move it); returns the new address</td></tr>
+<tr><td><code>free(ptr)</code></td><td>Returns the block to the heap</td></tr>
+</table></div>
+<pre class="code"><code>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+ 
+int main(void) {
+    int n = 5;
+    int *arr = malloc(n * sizeof *arr);     // space for 5 ints
+    if (arr == NULL) {                      // ALWAYS check
+        printf("Out of memory\n");
+        return 1;
+    }
+ 
+    for (int i = 0; i &lt; n; i++) arr[i] = i * i;
+ 
+    // grow to 10 elements: use a temporary pointer
+    int *tmp = realloc(arr, 10 * sizeof *arr);
+    if (tmp == NULL) { free(arr); return 1; }
+    arr = tmp;
+ 
+    for (int i = 5; i &lt; 10; i++) arr[i] = i * i;
+    for (int i = 0; i &lt; 10; i++) printf("%d ", arr[i]);
+ 
+    free(arr);          // give it back
+    arr = NULL;         // avoid a dangling pointer
+    return 0;
+}</code></pre>
+<p><strong>Output:</strong></p>
+<pre class="code"><code>0 1 4 9 16 25 36 49 64 81</code></pre>
+<p>Why sizeof *arr? It stays correct even if you change the pointer type later. Why a temporary pointer in realloc? If realloc fails it returns NULL, and writing that straight into arr would lose the old block (a leak).</p>
+<h2 id="7-3-memory-problems">7.3 Memory problems</h2>
+<div class="tablewrap"><table>
+<tr><th><strong>Problem</strong></th><th><strong>Example</strong></th><th><strong>Result</strong></th></tr>
+<tr><td>Memory leak</td><td>malloc without free, or losing the pointer</td><td>RAM slowly runs out</td></tr>
+<tr><td>Double free</td><td>free(p); free(p);</td><td>Crash or heap corruption</td></tr>
+<tr><td>Use after free</td><td>free(p); *p = 3;</td><td>Undefined behaviour</td></tr>
+<tr><td>Buffer overflow</td><td>Writing past the allocated size</td><td>Corrupts neighbouring data</td></tr>
+<tr><td>Uninitialised read</td><td>Reading malloc memory before writing</td><td>Garbage values</td></tr>
+</table></div>
+<h2 id="7-4-linked-list-a-classic-heap-use">7.4 Linked list: a classic heap use</h2>
+<p>An array has a fixed size. A linked list grows one node at a time; each node holds data and a pointer to the next node.</p>
+<pre class="code"><code>typedef struct Node {
+    int data;
+    struct Node *next;
+} Node;
+ 
+Node *push_front(Node *head, int value) {
+    Node *n = malloc(sizeof *n);
+    if (n == NULL) return head;
+    n-&gt;data = value;
+    n-&gt;next = head;          // new node points to old first node
+    return n;                // new node is now the head
+}
+ 
+void print_list(const Node *head) {
+    for (const Node *p = head; p != NULL; p = p-&gt;next)
+        printf("%d -&gt; ", p-&gt;data);
+    printf("NULL\n");
+}
+ 
+void free_list(Node *head) {
+    while (head != NULL) {
+        Node *next = head-&gt;next;     // save before freeing
+        free(head);
+        head = next;
+    }
+}
+ 
+int main(void) {
+    Node *list = NULL;
+    list = push_front(list, 3);
+    list = push_front(list, 2);
+    list = push_front(list, 1);
+    print_list(list);
+    free_list(list);
+    return 0;
+}</code></pre>
+<p><strong>Output:</strong></p>
+<pre class="code"><code>1 -&gt; 2 -&gt; 3 -&gt; NULL</code></pre>
+<h2 id="7-5-dynamic-memory-in-embedded-systems">7.5 Dynamic memory in embedded systems</h2>
+<ul>
+<li>Small chips have kilobytes of RAM. Repeated malloc and free cause fragmentation: enough total free memory but no single block big enough.</li>
+<li>Allocation time is unpredictable, which hurts real-time behaviour.</li>
+<li>Safety-critical standards (MISRA, automotive, medical) often forbid heap use after start-up.</li>
+<li>Preferred: static arrays, fixed-size buffers and memory pools.</li>
+<li>On ESP32 you do have a heap and FreeRTOS; allocate once at start-up and keep it. Check free heap with ESP.getFreeHeap() in Arduino code.</li>
+</ul>
+<h2 id="common-mistakes-7">Common mistakes</h2>
+<div class="tablewrap"><table>
+<tr><th><strong>Mistake</strong></th><th><strong>Fix</strong></th></tr>
+<tr><td>Not checking malloc for NULL</td><td>Always test the result</td></tr>
+<tr><td>Forgetting free (leak)</td><td>Pair every malloc with one free; free in the same module that allocated</td></tr>
+<tr><td>Using the pointer after free</td><td>Set the pointer to NULL after free</td></tr>
+<tr><td>malloc(n) instead of malloc(n * sizeof(type))</td><td>Multiply by the element size</td></tr>
+<tr><td>arr = realloc(arr, size) losing the block on failure</td><td>Use a temporary pointer</td></tr>
+<tr><td>Freeing stack memory or a pointer not from malloc</td><td>Only free what malloc, calloc or realloc returned</td></tr>
+</table></div>
+<h2 id="practice-programs-type-each-one-yourself-7">Practice programs (type each one yourself)</h2>
+<ol>
+<li>Ask the user for n, allocate an array of n ints, fill it, print the average, free it.</li>
+<li>Read strings of unknown length by growing a buffer with realloc.</li>
+<li>Build a linked list: push_front, push_back, delete a value, reverse the list, free everything.</li>
+<li>Create a dynamic 2D array (array of pointers) and free it correctly.</li>
+<li>Write code with a deliberate leak, then find it with valgrind --leak-check=full ./a.out.</li>
+<li>Redo the array program using a fixed static buffer and compare the pros and cons.</li>
+</ol>
+<h2 id="interview-questions-with-short-answers-7">Interview questions with short answers</h2>
+<p><strong>Q1. Difference between malloc and calloc? calloc takes count and size and zeroes the memory; malloc does not initialise.</strong></p>
+<p><strong>Q2. What is a memory leak? Allocated memory that is never freed and can no longer be reached.</strong></p>
+<p><strong>Q3. What does realloc do if it cannot extend in place? It allocates a new block, copies the data and frees the old one.</strong></p>
+<p><strong>Q4. Why avoid malloc in embedded systems? Fragmentation, unpredictable timing and failure handling on tiny RAM.</strong></p>
+<p><strong>Q5. Stack vs heap? Stack is automatic and fast for locals; heap is manual and flexible for run-time sizes.</strong></p>
+<p><strong>Q6. What happens if you free the same pointer twice? Undefined behaviour, often a crash or heap corruption.</strong></p>
+<p><strong>TOPIC 8</strong></p>
+<h1 id="storage-classes-and-the-preprocessor">Storage Classes and the Preprocessor</h1>
+<aside class="callout info" style="--c:#2A7F8E"><p><strong>In one line</strong></p>
+<p>Storage classes decide where a variable lives, how long it lives and who can see it; the preprocessor edits your source text (includes, macros, conditions) before compilation.</p></aside>
+<h2 id="8-1-the-four-storage-classes">8.1 The four storage classes</h2>
+<div class="tablewrap"><table>
+<tr><th><strong>Class</strong></th><th><strong>Scope (who sees it)</strong></th><th><strong>Lifetime</strong></th><th><strong>Default value</strong></th><th><strong>Stored in</strong></th></tr>
+<tr><td><code>auto</code></td><td>Block</td><td>Until block ends</td><td>Garbage</td><td>Stack</td></tr>
+<tr><td><code>register</code></td><td>Block</td><td>Until block ends</td><td>Garbage</td><td>CPU register (a hint)</td></tr>
+<tr><td><code>static</code></td><td>Block or file</td><td>Whole program</td><td>0</td><td>Data / BSS</td></tr>
+<tr><td><code>extern</code></td><td>Whole program</td><td>Whole program</td><td>0</td><td>Data / BSS</td></tr>
+</table></div>
+<p>auto is the default for local variables, so you almost never type it. register is a request to the compiler that modern compilers ignore (they decide better).</p>
+<h2 id="8-2-static">8.2 static</h2>
+<p>static does two different jobs depending on where it is written.</p>
+<ul>
+<li>static inside a function: the variable keeps its value between calls (lifetime = whole program) but only that function can see it.</li>
+<li>static at file level (global or function): it is private to this .c file (internal linkage). Other files cannot access it.</li>
+</ul>
+<pre class="code"><code>void counter(void) {
+    static int count = 0;      // initialised once only
+    count++;
+    printf("called %d times\n", count);
+}
+ 
+counter();   // called 1 times
+counter();   // called 2 times
+counter();   // called 3 times</code></pre>
+<aside class="callout info" style="--c:#2A7F8E"><p><strong>Embedded use</strong></p>
+<p>Use static for file-private variables and helper functions in a driver. It works like "private" in other languages and prevents name clashes between files.</p></aside>
+<h2 id="8-3-extern">8.3 extern</h2>
+<p>extern says "this variable exists, it is defined in another file". It declares without creating.</p>
+<pre class="code"><code>// config.c
+int baud_rate = 115200;          // definition: memory is created here
+ 
+// main.c
+#include &lt;stdio.h&gt;
+extern int baud_rate;            // declaration: refers to the one above
+ 
+int main(void) { printf("%d\n", baud_rate); return 0; }</code></pre>
+<p>Normally you put the extern declaration in a header file (config.h) so every file shares the same one.</p>
+<h2 id="8-4-the-preprocessor">8.4 The preprocessor</h2>
+<p>Lines starting with # are processed before compilation. The preprocessor only edits text; it knows nothing about C types.</p>
+<div class="tablewrap"><table>
+<tr><th><strong>Directive</strong></th><th><strong>Purpose</strong></th></tr>
+<tr><td><code>#include &lt;file&gt;</code></td><td>Search system folders (standard headers)</td></tr>
+<tr><td><code>#include "file"</code></td><td>Search your project folder first (your headers)</td></tr>
+<tr><td><code>#define NAME value</code></td><td>Replace NAME with value everywhere</td></tr>
+<tr><td><code>#undef NAME</code></td><td>Remove a definition</td></tr>
+<tr><td><code>#ifdef / #ifndef / #if</code></td><td>Compile code only if a condition is true</td></tr>
+<tr><td><code>#else / #elif / #endif</code></td><td>Alternatives and end of a conditional block</td></tr>
+<tr><td><code>#error / #warning</code></td><td>Stop or warn at compile time with a message</td></tr>
+</table></div>
+<h2 id="8-5-macros">8.5 Macros</h2>
+<pre class="code"><code>#define PI 3.14159
+#define LED_PIN 13
+#define SQUARE(x) ((x) * (x))
+#define MAX(a, b) ((a) &gt; (b) ? (a) : (b))
+ 
+int r = SQUARE(2 + 3);          // becomes ((2 + 3) * (2 + 3)) = 25</code></pre>
+<aside class="callout warn" style="--c:#C0392B"><p><strong>Brackets are not optional</strong></p>
+<p>If you write #define SQUARE(x) x * x, then SQUARE(2 + 3) becomes 2 + 3 * 2 + 3 = 11, not 25. Put every parameter and the whole expression in brackets.</p>
+<p>Side effects: MAX(i++, j) may evaluate i++ twice. Use an inline function when you can.</p></aside>
+<div class="tablewrap"><table>
+<tr><th></th><th><strong>Macro</strong></th><th><strong>const / inline function</strong></th></tr>
+<tr><td>Type checking</td><td>None</td><td>Yes</td></tr>
+<tr><td>Debugging</td><td>Hard (text replaced)</td><td>Easier</td></tr>
+<tr><td>Memory</td><td>None until used</td><td>const may take memory</td></tr>
+<tr><td>Best for</td><td>Pin numbers, register addresses, bit masks, conditional builds</td><td>Typed constants and small functions</td></tr>
+</table></div>
+<h2 id="8-6-include-guards">8.6 Include guards</h2>
+<p>If two headers include the same header, the compiler sees duplicate definitions and fails. An include guard makes a header count only once.</p>
+<pre class="code"><code>#ifndef SENSOR_H
+#define SENSOR_H
+ 
+int read_sensor(void);
+ 
+#endif</code></pre>
+<h2 id="8-7-conditional-compilation">8.7 Conditional compilation</h2>
+<pre class="code"><code>#define DEBUG 1
+ 
+#if DEBUG
+    #define LOG(msg) printf("[LOG] %s\n", msg)
+#else
+    #define LOG(msg)            // expands to nothing in release builds
+#endif
+ 
+#ifdef ESP32
+    // code only for the ESP32 board
+#elif defined(ARDUINO_AVR_UNO)
+    // code only for the Arduino Uno
+#endif</code></pre>
+<p>Conditional compilation lets one code base support several boards or switch debug output on and off with zero cost in the final firmware.</p>
+<h2 id="common-mistakes-8">Common mistakes</h2>
+<div class="tablewrap"><table>
+<tr><th><strong>Mistake</strong></th><th><strong>Fix</strong></th></tr>
+<tr><td>Macro without brackets</td><td>Wrap each parameter and the whole expression</td></tr>
+<tr><td>Semicolon at the end of #define</td><td>Do not add one: #define N 10</td></tr>
+<tr><td>Defining a variable in a header</td><td>Define in one .c file, declare with extern in the header</td></tr>
+<tr><td>Missing include guard</td><td>Add #ifndef / #define / #endif to every header</td></tr>
+<tr><td>Expecting a static local to reset on each call</td><td>It keeps its value; initialisation runs only once</td></tr>
+<tr><td>Using #define for typed values</td><td>Prefer const or enum when type safety matters</td></tr>
+</table></div>
+<h2 id="practice-programs-type-each-one-yourself-8">Practice programs (type each one yourself)</h2>
+<ol>
+<li>Write a function that counts how many times it has been called using static.</li>
+<li>Create config.c with a global and use it in main.c through extern.</li>
+<li>Write SQUARE, MAX and MIN macros and test them with expressions like 2 + 3.</li>
+<li>Split a project into main.c, utils.c and utils.h with an include guard.</li>
+<li>Add a DEBUG switch so that log messages disappear when DEBUG is 0.</li>
+<li>Show the preprocessor output with gcc -E main.c and find where your macro was replaced.</li>
+</ol>
+<h2 id="interview-questions-with-short-answers-8">Interview questions with short answers</h2>
+<p><strong>Q1. What does static do? Inside a function it keeps the value between calls; at file level it hides the name from other files.</strong></p>
+<p><strong>Q2. Difference between declaration and definition of a global? A definition creates storage; extern declarations only refer to it.</strong></p>
+<p><strong>Q3. What is an include guard? Preprocessor lines that make sure a header is included only once per file.</strong></p>
+<p><strong>Q4. Macro vs function? A macro is text replacement without type checks and no call overhead; a function is type-safe and debuggable.</strong></p>
+<p><strong>Q5. What is the default value of a static variable? Zero.</strong></p>
+<p><strong>Q6. #include &lt;&gt; vs ""? Angle brackets search system paths; quotes search the project folder first.</strong></p>
+<p><strong>TOPIC 9</strong></p>
+<h1 id="file-handling">File Handling</h1>
+<aside class="callout info" style="--c:#2A7F8E"><p><strong>In one line</strong></p>
+<p>File handling lets a program store data permanently by reading and writing files using a FILE pointer and functions such as fopen, fprintf, fread and fclose.</p></aside>
+<h2 id="9-1-why-files">9.1 Why files?</h2>
+<p>Variables vanish when the program ends. Files keep data: logs, configuration, records. On microcontrollers the same ideas apply to an SD card, SPIFFS or LittleFS on ESP32 (the function names differ slightly but the steps are the same).</p>
+<aside class="callout info" style="--c:#2A7F8E"><p><strong>Analogy: a notebook</strong></p>
+<p>Open the notebook (fopen), read or write on it (fprintf, fscanf, fread, fwrite), and close it (fclose) so everything is saved.</p></aside>
+<h2 id="9-2-steps-for-every-file-operation">9.2 Steps for every file operation</h2>
+<ol>
+<li>Declare a FILE pointer: FILE *fp;</li>
+<li>Open the file with fopen and check it did not return NULL.</li>
+<li>Read or write.</li>
+<li>Close with fclose.</li>
+</ol>
+<div class="tablewrap"><table>
+<tr><th><strong>Mode</strong></th><th><strong>Meaning</strong></th></tr>
+<tr><td><code>"r"</code></td><td>Read. File must exist</td></tr>
+<tr><td><code>"w"</code></td><td>Write. Creates the file, or ERASES it if it exists</td></tr>
+<tr><td><code>"a"</code></td><td>Append. Writes at the end; creates the file if missing</td></tr>
+<tr><td><code>"r+"</code></td><td>Read and write an existing file</td></tr>
+<tr><td><code>"w+"</code></td><td>Read and write; erases existing content</td></tr>
+<tr><td><code>"rb" "wb" "ab"</code></td><td>Same as above but binary (add b)</td></tr>
+</table></div>
+<h2 id="9-3-text-files">9.3 Text files</h2>
+<pre class="code"><code>#include &lt;stdio.h&gt;
+ 
+int main(void) {
+    FILE *fp = fopen("data.txt", "w");
+    if (fp == NULL) {
+        perror("fopen");              // prints why it failed
+        return 1;
+    }
+    fprintf(fp, "Ravi %d %.1f\n", 101, 88.5);
+    fprintf(fp, "Anu %d %.1f\n", 102, 91.0);
+    fclose(fp);
+ 
+    fp = fopen("data.txt", "r");
+    if (fp == NULL) return 1;
+ 
+    char name[20];
+    int roll;
+    float marks;
+    while (fscanf(fp, "%19s %d %f", name, &amp;roll, &amp;marks) == 3)
+        printf("%s %d %.1f\n", name, roll, marks);
+    fclose(fp);
+    return 0;
+}</code></pre>
+<p><strong>Output:</strong></p>
+<pre class="code"><code>Ravi 101 88.5
+Anu 102 91.0</code></pre>
+<p>fscanf returns the number of items it managed to read. Looping while it returns 3 stops cleanly at the end of the file.</p>
+<h2 id="9-4-reading-line-by-line">9.4 Reading line by line</h2>
+<pre class="code"><code>char line[100];
+FILE *fp = fopen("log.txt", "r");
+if (fp != NULL) {
+    while (fgets(line, sizeof line, fp) != NULL)
+        printf("%s", line);          // fgets keeps the newline
+    fclose(fp);
+}</code></pre>
+<div class="tablewrap"><table>
+<tr><th><strong>Function</strong></th><th><strong>Use</strong></th></tr>
+<tr><td><code>fprintf / fscanf</code></td><td>Formatted text, like printf / scanf but for files</td></tr>
+<tr><td><code>fputs / fgets</code></td><td>Write or read a line of text</td></tr>
+<tr><td><code>fputc / fgetc</code></td><td>Write or read one character</td></tr>
+<tr><td><code>fwrite / fread</code></td><td>Write or read raw bytes (binary files)</td></tr>
+<tr><td><code>fseek / ftell / rewind</code></td><td>Move to a position, find the position, go back to start</td></tr>
+<tr><td><code>feof / ferror</code></td><td>Check end of file or an error</td></tr>
+</table></div>
+<h2 id="9-5-binary-files-save-structs-directly">9.5 Binary files: save structs directly</h2>
+<pre class="code"><code>typedef struct { char name[20]; int roll; float marks; } Student;
+ 
+Student s = {"Ravi", 101, 88.5f};
+ 
+FILE *fp = fopen("students.bin", "wb");
+if (fp) {
+    fwrite(&amp;s, sizeof(Student), 1, fp);     // 1 record
+    fclose(fp);
+}
+ 
+Student t;
+fp = fopen("students.bin", "rb");
+if (fp) {
+    if (fread(&amp;t, sizeof(Student), 1, fp) == 1)
+        printf("%s %d %.1f\n", t.name, t.roll, t.marks);
+    fclose(fp);
+}</code></pre>
+<p><strong>Output:</strong></p>
+<pre class="code"><code>Ravi 101 88.5</code></pre>
+<p>Binary files are compact and fast, but they depend on the compiler, struct padding and endianness, so they are not portable between different systems. Text files are bigger but readable.</p>
+<h2 id="9-6-jumping-around-a-file">9.6 Jumping around a file</h2>
+<pre class="code"><code>fseek(fp, 0, SEEK_END);        // go to the end
+long size = ftell(fp);         // position = file size in bytes
+rewind(fp);                    // back to the start
+ 
+// jump straight to the 3rd record (index 2) of a binary file
+fseek(fp, 2 * sizeof(Student), SEEK_SET);</code></pre>
+<aside class="callout warn" style="--c:#C0392B"><p><strong>The while(!feof(fp)) bug</strong></p>
+<p>feof becomes true only after a read has failed, so this loop runs one extra time and processes garbage. Test the return value of the read function instead (fscanf, fgets, fread).</p></aside>
+<h2 id="common-mistakes-9">Common mistakes</h2>
+<div class="tablewrap"><table>
+<tr><th><strong>Mistake</strong></th><th><strong>Fix</strong></th></tr>
+<tr><td>Not checking if fopen returned NULL</td><td>Always check; print the reason with perror</td></tr>
+<tr><td>Forgetting fclose</td><td>Data may stay in the buffer and be lost; always close</td></tr>
+<tr><td>Opening with "w" and erasing data by accident</td><td>Use "a" to add or "r+" to modify</td></tr>
+<tr><td>Using while(!feof(fp))</td><td>Loop on the read function's return value</td></tr>
+<tr><td>Reading a binary file in text mode (or the reverse)</td><td>Match the mode: "rb" with fread</td></tr>
+<tr><td>fscanf("%s") overflow on long words</td><td>Use a width: %19s for char[20]</td></tr>
+</table></div>
+<h2 id="practice-programs-type-each-one-yourself-9">Practice programs (type each one yourself)</h2>
+<ol>
+<li>Write 5 numbers into a file, then read and print their sum.</li>
+<li>Copy one text file into another, converting all letters to upper case.</li>
+<li>Count characters, words and lines of a text file.</li>
+<li>Build a student record manager: add, list and search records stored in a binary file.</li>
+<li>Append timestamped log lines to log.txt every time the program runs.</li>
+<li>Use fseek to read the last record of a binary file without reading the others.</li>
+</ol>
+<h2 id="interview-questions-with-short-answers-9">Interview questions with short answers</h2>
+<p><strong>Q1. What is FILE *? A pointer to a structure that holds the state of an open file (buffer, position, flags).</strong></p>
+<p><strong>Q2. Difference between "w" and "a"? "w" erases existing content; "a" appends at the end.</strong></p>
+<p><strong>Q3. Text vs binary file? Text stores characters (human readable, newline conversion on some systems); binary stores raw bytes exactly as in memory.</strong></p>
+<p><strong>Q4. Why must you call fclose? It flushes buffered data to storage and releases the file handle.</strong></p>
+<p><strong>Q5. What do fread and fwrite return? The number of items successfully read or written.</strong></p>
+<p><strong>Q6. How do you find the size of a file? fseek to SEEK_END then ftell.</strong></p>
+<p><strong>TOPIC 10</strong></p>
+<h1 id="bitwise-operators-and-bit-manipulation">Bitwise Operators and Bit Manipulation</h1>
+<aside class="callout info" style="--c:#2A7F8E"><p><strong>In one line</strong></p>
+<p>Bitwise operators work on the individual bits of a number. They are the main tool for controlling hardware registers, flags and protocols in embedded C.</p></aside>
+<h2 id="10-1-why-bits-matter-in-embedded">10.1 Why bits matter in embedded</h2>
+<p>A hardware register is a number where each bit (or group of bits) controls one thing: bit 5 turns an LED pin on, bits 2 to 4 select a clock speed, bit 7 says "data ready". To change one bit without disturbing the others, you need bitwise operators.</p>
+<aside class="callout info" style="--c:#2A7F8E"><p><strong>Analogy: a row of light switches</strong></p>
+<p>A byte is a panel of 8 switches. Bitwise operators let you flip one switch, check one switch, or set a pattern, without touching the others.</p></aside>
+<h2 id="10-2-the-six-operators">10.2 The six operators</h2>
+<div class="tablewrap"><table>
+<tr><th><strong>Op</strong></th><th><strong>Name</strong></th><th><strong>Rule</strong></th></tr>
+<tr><td><code>&amp;</code></td><td>AND</td><td>1 only if both bits are 1 (used to CLEAR bits and to CHECK bits)</td></tr>
+<tr><td><code>|</code></td><td>OR</td><td>1 if either bit is 1 (used to SET bits)</td></tr>
+<tr><td><code>^</code></td><td>XOR</td><td>1 if the bits are different (used to TOGGLE bits)</td></tr>
+<tr><td><code>~</code></td><td>NOT</td><td>Flips every bit</td></tr>
+<tr><td><code>&lt;&lt;</code></td><td>Left shift</td><td>Moves bits left, fills with 0; x &lt;&lt; n multiplies by 2^n</td></tr>
+<tr><td><code>&gt;&gt;</code></td><td>Right shift</td><td>Moves bits right; x &gt;&gt; n divides by 2^n (for unsigned)</td></tr>
+</table></div>
+<p>Worked example with a = 12 (1100) and b = 10 (1010):</p>
+<div class="tablewrap"><table>
+<tr><th><strong>Expression</strong></th><th><strong>Binary work</strong></th><th><strong>Result</strong></th><th><strong>Decimal</strong></th></tr>
+<tr><td>12 &amp; 10</td><td><code>1100 &amp; 1010</code></td><td>1000</td><td>8</td></tr>
+<tr><td>12 | 10</td><td><code>1100 | 1010</code></td><td>1110</td><td>14</td></tr>
+<tr><td>12 ^ 10</td><td><code>1100 ^ 1010</code></td><td>0110</td><td>6</td></tr>
+<tr><td>12 &lt;&lt; 1</td><td><code>1100 -&gt; 11000</code></td><td>11000</td><td>24</td></tr>
+<tr><td>12 &gt;&gt; 1</td><td><code>1100 -&gt; 0110</code></td><td>0110</td><td>6</td></tr>
+<tr><td>~12 (8-bit)</td><td><code>~00001100</code></td><td>11110011</td><td>243 unsigned, -13 signed</td></tr>
+</table></div>
+<aside class="callout warn" style="--c:#C0392B"><p><strong>Do not confuse &amp; with &amp;&amp;</strong></p>
+<p>&amp;&amp; is logical AND (true/false of whole values). &amp; is bitwise AND (bit by bit). 4 &amp;&amp; 2 is 1 (both non-zero), but 4 &amp; 2 is 0 (no common bits).</p></aside>
+<h2 id="10-3-the-four-essential-operations">10.3 The four essential operations</h2>
+<div class="tablewrap"><table>
+<tr><th><strong>Goal</strong></th><th><strong>Code</strong></th><th><strong>Why it works</strong></th></tr>
+<tr><td>Set bit n</td><td><code>x |= (1 &lt;&lt; n);</code></td><td>OR with a 1 forces the bit to 1, others unchanged</td></tr>
+<tr><td>Clear bit n</td><td><code>x &amp;= ~(1 &lt;&lt; n);</code></td><td>AND with a 0 forces the bit to 0, others unchanged</td></tr>
+<tr><td>Toggle bit n</td><td><code>x ^= (1 &lt;&lt; n);</code></td><td>XOR with 1 flips the bit</td></tr>
+<tr><td>Check bit n</td><td><code>if (x &amp; (1 &lt;&lt; n))</code></td><td>AND leaves only that bit; non-zero means it was 1</td></tr>
+</table></div>
+<p>Step by step: set bit 3 of x = 0b00000101 (5).</p>
+<ol>
+<li>1 &lt;&lt; 3 gives the mask 00001000.</li>
+<li>x | mask = 00000101 | 00001000 = 00001101 (13).</li>
+<li>Only bit 3 changed.</li>
+</ol>
+<pre class="code"><code>#define SET_BIT(x, n)     ((x) |=  (1U &lt;&lt; (n)))
+#define CLEAR_BIT(x, n)   ((x) &amp;= ~(1U &lt;&lt; (n)))
+#define TOGGLE_BIT(x, n)  ((x) ^=  (1U &lt;&lt; (n)))
+#define CHECK_BIT(x, n)   (((x) &gt;&gt; (n)) &amp; 1U)
+ 
+int main(void) {
+    unsigned char x = 5;            // 00000101
+    SET_BIT(x, 3);                  // 00001101
+    printf("%u\n", x);              // 13
+    CLEAR_BIT(x, 0);                // 00001100
+    printf("%u\n", x);              // 12
+    TOGGLE_BIT(x, 7);               // 10001100
+    printf("%u\n", x);              // 140
+    printf("%u\n", CHECK_BIT(x, 2));   // 1
+    return 0;
+}</code></pre>
+<p><strong>Output:</strong></p>
+<pre class="code"><code>13
+12
+140
+1</code></pre>
+<h2 id="10-4-multi-bit-fields-mask-shift-insert">10.4 Multi-bit fields: mask, shift, insert</h2>
+<p>Suppose bits 4 to 6 of a register hold a 3-bit "mode" value.</p>
+<pre class="code"><code>#define MODE_SHIFT 4
+#define MODE_MASK  (0x7U &lt;&lt; MODE_SHIFT)       // 0111 0000
+ 
+uint8_t reg = 0xA5;                           // 1010 0101
+ 
+// READ the field: shift it down, then mask
+uint8_t mode = (reg &gt;&gt; MODE_SHIFT) &amp; 0x7U;    // 010 = 2
+ 
+// WRITE the field: clear the old bits, then OR in the new value
+reg = (reg &amp; ~MODE_MASK) | ((5U &lt;&lt; MODE_SHIFT) &amp; MODE_MASK);   // mode = 101</code></pre>
+<p>This "clear then set" pattern is the standard way to update part of a register safely.</p>
+<h2 id="10-5-classic-tricks-frequent-interview-questions">10.5 Classic tricks (frequent interview questions)</h2>
+<pre class="code"><code>// even or odd
+if (n &amp; 1) { /* odd */ }
+ 
+// power of two (n must be &gt; 0)
+int is_pow2 = (n &gt; 0) &amp;&amp; ((n &amp; (n - 1)) == 0);
+ 
+// count set bits (Kernighan): each loop removes the lowest 1 bit
+int count_bits(unsigned int n) {
+    int c = 0;
+    while (n) { n &amp;= (n - 1); c++; }
+    return c;
+}
+ 
+// swap two numbers without a temporary variable
+a ^= b;  b ^= a;  a ^= b;
+ 
+// swap the two nibbles of a byte
+uint8_t swapped = (uint8_t)((x &lt;&lt; 4) | (x &gt;&gt; 4));
+ 
+// multiply and divide by 8 (unsigned)
+y = x &lt;&lt; 3;     // x * 8
+z = x &gt;&gt; 3;     // x / 8</code></pre>
+<p>Why n &amp; (n-1) works: subtracting 1 flips the lowest 1 bit to 0 and all the zeros below it to 1, so AND-ing removes exactly that lowest 1.</p>
+<h2 id="10-6-traps-to-remember">10.6 Traps to remember</h2>
+<ul>
+<li>Precedence: == binds tighter than &amp;. Write if ((x &amp; 4) == 4), not if (x &amp; 4 == 4).</li>
+<li>Use unsigned types (or 1U, 1UL) for shifts. Shifting a signed negative value is implementation-defined, and shifting 1 into the sign bit of an int is undefined.</li>
+<li>Do not shift by the width of the type or more (1 &lt;&lt; 32 on a 32-bit int is undefined).</li>
+<li>On 8-bit and 16-bit systems use 1UL &lt;&lt; n if n can be 16 or more, otherwise the 1 is only 16 bits wide.</li>
+<li>Integer promotion: uint8_t values become int in expressions, so ~x on a uint8_t gives a 32-bit result. Cast back: (uint8_t)~x.</li>
+</ul>
+<h2 id="10-7-real-hardware-example-arduino-uno-avr">10.7 Real hardware example (Arduino Uno, AVR)</h2>
+<pre class="code"><code>// Pin 13 on the Uno is PB5. Blink it with direct register access.
+void setup() {
+    DDRB |= (1 &lt;&lt; DDB5);          // make PB5 an output
+}
+ 
+void loop() {
+    PORTB ^= (1 &lt;&lt; PORTB5);       // toggle only PB5, other pins untouched
+    delay(500);
+}</code></pre>
+<p>DDRB is the direction register (1 = output). PORTB holds the output levels. One line toggles one pin and leaves the other seven alone. This is exactly why you learn bit manipulation.</p>
+<h2 id="common-mistakes-10">Common mistakes</h2>
+<div class="tablewrap"><table>
+<tr><th><strong>Mistake</strong></th><th><strong>Fix</strong></th></tr>
+<tr><td>Using = instead of |= when setting a bit (wipes other bits)</td><td>Use x |= mask</td></tr>
+<tr><td>x &amp; 4 == 4 (precedence)</td><td>Add brackets: (x &amp; 4) == 4</td></tr>
+<tr><td>1 &lt;&lt; 31 on a signed int</td><td>Use 1U &lt;&lt; 31</td></tr>
+<tr><td>Using &amp;&amp; when you meant &amp;</td><td>Bitwise &amp; works per bit</td></tr>
+<tr><td>Right shifting negative signed numbers and assuming division</td><td>Use unsigned types for bit work</td></tr>
+<tr><td>Forgetting to clear a field before setting a new value</td><td>Clear the mask first, then OR the new bits</td></tr>
+</table></div>
+<h2 id="practice-programs-type-each-one-yourself-10">Practice programs (type each one yourself)</h2>
+<ol>
+<li>Write SET_BIT, CLEAR_BIT, TOGGLE_BIT, CHECK_BIT as functions and as macros; test on all 8 bits.</li>
+<li>Print any number in binary (8, 16 and 32 bits).</li>
+<li>Count the number of set bits in a number.</li>
+<li>Check if a number is a power of 2.</li>
+<li>Reverse the bits of a byte.</li>
+<li>Swap the upper and lower nibble of a byte.</li>
+<li>Pack three values (3 bits, 2 bits, 3 bits) into one byte and unpack them.</li>
+<li>Find the single non-repeating number in an array where all others appear twice (use XOR).</li>
+</ol>
+<h2 id="interview-questions-with-short-answers-10">Interview questions with short answers</h2>
+<p><strong>Q1. How do you set, clear, toggle and check bit n? Set: x |= 1&lt;&lt;n. Clear: x &amp;= ~(1&lt;&lt;n). Toggle: x ^= 1&lt;&lt;n. Check: (x&gt;&gt;n)&amp;1.</strong></p>
+<p><strong>Q2. Difference between &amp; and &amp;&amp;? &amp; works on each bit; &amp;&amp; works on whole values as true or false.</strong></p>
+<p><strong>Q3. How do you check for a power of 2? n &gt; 0 and (n &amp; (n-1)) == 0.</strong></p>
+<p><strong>Q4. What does x &lt;&lt; n do? Shifts bits left by n places, equal to multiplying by 2^n if no overflow.</strong></p>
+<p><strong>Q5. How do you swap two variables without a temp? a ^= b; b ^= a; a ^= b; (or with + and -).</strong></p>
+<p><strong>Q6. Why use unsigned for bit operations? Signed shifts and overflow have implementation-defined or undefined behaviour.</strong></p>
+<p><strong>Q7. How do you update a 3-bit field in a register without touching others? Clear the field with a mask, then OR in the new value shifted into position.</strong></p>
+<p><strong>TOPIC 11</strong></p>
+<h1 id="type-qualifiers-and-fixed-width-types">Type Qualifiers and Fixed-Width Types</h1>
+<aside class="callout info" style="--c:#2A7F8E"><p><strong>In one line</strong></p>
+<p>volatile, const and static tell the compiler extra facts about a variable; fixed-width types (uint8_t, uint32_t...) make sizes identical on every chip.</p></aside>
+<h2 id="11-1-volatile">11.1 volatile</h2>
+<p>Compilers optimise. If your code reads a variable in a loop and nothing in that loop changes it, the compiler assumes it never changes and reads it only once. That is wrong if hardware or an interrupt changes it behind the compiler's back. volatile means: "this value can change at any time, always read it from memory and never cache it."</p>
+<aside class="callout info" style="--c:#2A7F8E"><p><strong>Analogy: a whiteboard in a busy office</strong></p>
+<p>Without volatile, the compiler copies the whiteboard into its notebook once and keeps reading its notes. With volatile, it must look at the whiteboard every single time, because someone else keeps writing on it.</p></aside>
+<pre class="code"><code>int flag = 0;                      // BUG: not volatile
+ 
+void ISR(void) { flag = 1; }       // interrupt sets the flag
+ 
+int main(void) {
+    while (flag == 0) { }          // compiler may turn this into an endless loop
+    do_work();
+}
+ 
+// FIX
+volatile int flag = 0;</code></pre>
+<p>Three situations that need volatile:</p>
+<div class="tablewrap"><table>
+<tr><th><strong>Situation</strong></th><th><strong>Example</strong></th></tr>
+<tr><td>Hardware register</td><td>volatile uint32_t *status = (volatile uint32_t *)0x40021018;</td></tr>
+<tr><td>Variable changed in an ISR and read in main (or the reverse)</td><td>volatile uint8_t button_pressed;</td></tr>
+<tr><td>Variable shared between tasks / threads (with proper locking)</td><td>volatile bool running;</td></tr>
+</table></div>
+<aside class="callout warn" style="--c:#C0392B"><p><strong>volatile does not make code safe</strong></p>
+<p>volatile only stops the compiler from caching the value. It does not make a multi-byte read atomic. On an 8-bit AVR, reading a 16-bit volatile variable takes two instructions; an interrupt in between can give a half-old, half-new value. Disable interrupts around such reads (Topic 15).</p></aside>
+<h2 id="11-2-const">11.2 const</h2>
+<ul>
+<li>const means the program may not modify the value. The compiler reports an error if you try.</li>
+<li>It documents intent: a function taking const char *s promises not to change the string.</li>
+<li>Global const data is placed in flash (read-only memory) on most microcontrollers, saving RAM. On AVR Arduino you need PROGMEM to be sure; on ESP32 and ARM it happens automatically.</li>
+</ul>
+<pre class="code"><code>const int MAX_RETRY = 3;                       // cannot change
+const uint8_t sine_table[8] = {0, 90, 127, 90, 0, 90, 127, 90};   // lookup table in flash
+ 
+int length(const char *s);                     // promises not to modify s</code></pre>
+<h2 id="11-3-const-volatile-together">11.3 const volatile together</h2>
+<p>This looks contradictory but is common for read-only hardware registers, for example a status register or an input-port register. Your code must not write it (const), but the hardware changes it all the time (volatile).</p>
+<pre class="code"><code>const volatile uint32_t *const STATUS_REG = (const volatile uint32_t *)0x40010000;
+ 
+while ((*STATUS_REG &amp; 0x01) == 0) { }   // wait until the ready bit is set</code></pre>
+<h2 id="11-4-static-recap">11.4 static (recap)</h2>
+<p>Local static: keeps its value across calls. File-level static: hidden from other files. Both live in the data or BSS area, not on the stack. Details in Topic 8.</p>
+<h2 id="11-5-fixed-width-integer-types">11.5 Fixed-width integer types</h2>
+<p>Because int, long and even char can differ between chips, include &lt;stdint.h&gt; and use types whose width is part of the name.</p>
+<div class="tablewrap"><table>
+<tr><th><strong>Type</strong></th><th><strong>Bits</strong></th><th><strong>Range</strong></th><th><strong>Typical use</strong></th></tr>
+<tr><td><code>int8_t / uint8_t</code></td><td>8</td><td>-128..127 / 0..255</td><td>Bytes, flags, 8-bit registers</td></tr>
+<tr><td><code>int16_t / uint16_t</code></td><td>16</td><td>-32768..32767 / 0..65535</td><td>ADC values, 16-bit registers</td></tr>
+<tr><td><code>int32_t / uint32_t</code></td><td>32</td><td>+/-2.1 billion / 0..4.29 billion</td><td>32-bit registers, timestamps</td></tr>
+<tr><td><code>int64_t / uint64_t</code></td><td>64</td><td>very large</td><td>Long counters (slow on 8-bit chips)</td></tr>
+<tr><td><code>size_t</code></td><td>varies</td><td>unsigned, holds a size</td><td>Array sizes, sizeof results, loop indexes</td></tr>
+<tr><td><code>bool (stdbool.h)</code></td><td>8 typically</td><td>true or false</td><td>Flags and conditions</td></tr>
+</table></div>
+<pre class="code"><code>#include &lt;stdint.h&gt;
+#include &lt;stdbool.h&gt;
+ 
+uint8_t  led_state  = 0;
+uint16_t adc_value  = 3120;
+uint32_t millis_now = 0;
+bool     connected  = false;
+ 
+// guaranteed on every platform:
+// sizeof(uint8_t) == 1,  sizeof(uint16_t) == 2,  sizeof(uint32_t) == 4</code></pre>
+<h2 id="11-6-choosing-the-right-type">11.6 Choosing the right type</h2>
+<div class="tablewrap"><table>
+<tr><th><strong>Situation</strong></th><th><strong>Use</strong></th></tr>
+<tr><td>Hardware register, communication buffer, protocol field</td><td>uint8_t / uint16_t / uint32_t</td></tr>
+<tr><td>Loop counter on a PC or 32-bit MCU</td><td>int or size_t</td></tr>
+<tr><td>Value that is never negative</td><td>unsigned type</td></tr>
+<tr><td>Small signed sensor value</td><td>int16_t</td></tr>
+<tr><td>Code must run on Uno and ESP32</td><td>Fixed-width types only</td></tr>
+<tr><td>Might exceed 4 billion</td><td>uint64_t</td></tr>
+</table></div>
+<p>Printing: the simplest portable way is to cast, for example printf("%lu", (unsigned long)millis_now) and printf("%d", (int)led_state).</p>
+<h2 id="common-mistakes-11">Common mistakes</h2>
+<div class="tablewrap"><table>
+<tr><th><strong>Mistake</strong></th><th><strong>Fix</strong></th></tr>
+<tr><td>Missing volatile on a flag shared with an ISR</td><td>Add volatile; test with optimisation on (-O2)</td></tr>
+<tr><td>Believing volatile makes access atomic</td><td>Disable interrupts or use atomic operations for multi-byte data</td></tr>
+<tr><td>Using int for registers</td><td>Use uintN_t of the exact register width</td></tr>
+<tr><td>Declaring a lookup table without const (wastes RAM)</td><td>Mark constant tables const</td></tr>
+<tr><td>Mixing signed and unsigned comparisons</td><td>Keep both sides the same signedness</td></tr>
+<tr><td>Printing uint32_t with %d</td><td>Cast to unsigned long and use %lu, or use PRIu32</td></tr>
+</table></div>
+<h2 id="practice-programs-type-each-one-yourself-11">Practice programs (type each one yourself)</h2>
+<ol>
+<li>Write a program with a flag changed by a signal handler or timer. Remove volatile, compile with -O2 and observe.</li>
+<li>Print sizeof for char, short, int, long, long long and every stdint type on your PC and note differences from the Uno.</li>
+<li>Declare a const lookup table of 10 values and print it.</li>
+<li>Write a function with const char * that counts vowels; try to modify the string and read the compiler error.</li>
+<li>Make a table of the range of every stdint type using the limits macros (INT8_MIN, UINT32_MAX ...).</li>
+<li>Explain in one paragraph why a status register needs const volatile.</li>
+</ol>
+<h2 id="interview-questions-with-short-answers-11">Interview questions with short answers</h2>
+<p><strong>Q1. What does volatile do? It forbids the compiler from caching or removing reads and writes of that variable, because it may change outside the program flow.</strong></p>
+<p><strong>Q2. Give three uses of volatile in embedded systems. Hardware registers, ISR-shared variables, memory shared with DMA or other tasks.</strong></p>
+<p><strong>Q3. Can a variable be const and volatile? Yes: read-only to your code but changed by hardware, such as a status register.</strong></p>
+<p><strong>Q4. Does volatile guarantee atomicity? No. Multi-byte accesses can still be interrupted.</strong></p>
+<p><strong>Q5. Why use uint8_t instead of unsigned char? Clear intent and a guaranteed 8-bit width.</strong></p>
+<p><strong>Q6. Where does const data live on a microcontroller? Usually in flash (read-only memory), which saves RAM.</strong></p>
+<p><strong>Q7. What is size_t? The unsigned type returned by sizeof, big enough to index any object.</strong></p>
+<p><strong>TOPIC 12</strong></p>
+<h1 id="memory-layout-startup-code-padding-and-endianness">Memory Layout, Startup Code, Padding and Endianness</h1>
+<aside class="callout info" style="--c:#2A7F8E"><p><strong>In one line</strong></p>
+<p>Knowing where each variable lives (flash, RAM, stack, heap), what runs before main(), and how bytes are ordered explains many embedded bugs and interview questions.</p></aside>
+<h2 id="12-1-two-kinds-of-memory-in-a-microcontroller">12.1 Two kinds of memory in a microcontroller</h2>
+<div class="tablewrap"><table>
+<tr><th></th><th><strong>Flash (ROM)</strong></th><th><strong>RAM (SRAM)</strong></th></tr>
+<tr><td>Keeps data without power</td><td>Yes</td><td>No</td></tr>
+<tr><td>Writable at run time</td><td>Slow and limited; used for firmware</td><td>Yes, fast</td></tr>
+<tr><td>Holds</td><td>Program code, constants</td><td>Variables, stack, heap</td></tr>
+<tr><td>Typical size</td><td>ESP32 4 MB, Uno 32 KB</td><td>ESP32 about 520 KB, Uno 2 KB</td></tr>
+</table></div>
+<p>RAM is precious. Every wasted byte matters on a chip with 2 KB.</p>
+<h2 id="12-2-memory-sections-of-a-c-program">12.2 Memory sections of a C program</h2>
+<div class="tablewrap"><table>
+<tr><th><strong>Section</strong></th><th><strong>What goes in</strong></th><th><strong>Lives in</strong></th></tr>
+<tr><td><code>.text</code></td><td>Machine code (your functions)</td><td>Flash</td></tr>
+<tr><td><code>.rodata</code></td><td>const data and string literals</td><td>Flash</td></tr>
+<tr><td><code>.data</code></td><td>Global and static variables with a non-zero initial value</td><td>Flash (initial values) copied to RAM</td></tr>
+<tr><td><code>.bss</code></td><td>Global and static variables initialised to zero or not initialised</td><td>RAM (zeroed at start)</td></tr>
+<tr><td><code>Heap</code></td><td>malloc memory; grows upward</td><td>RAM</td></tr>
+<tr><td><code>Stack</code></td><td>Locals, return addresses; grows downward</td><td>RAM</td></tr>
+</table></div>
+<pre class="code"><code>#include &lt;stdlib.h&gt;
+ 
+int counter = 5;            // .data  (initialised, non-zero)
+int total;                  // .bss   (uninitialised, zeroed)
+const int LIMIT = 100;      // .rodata (flash)
+static int hidden = 0;      // .bss   (static, zero)
+ 
+void demo(void) {
+    int local = 1;                    // stack
+    static int calls = 0;             // .bss (static local)
+    int *p = malloc(16);              // pointer on stack, 16 bytes on heap
+    char *msg = "hello";              // pointer on stack, text in .rodata
+    free(p);
+}</code></pre>
+<p>Typical RAM picture (high address at the top):</p>
+<div class="tablewrap"><table>
+<tr><th><strong>Region</strong></th><th><strong>Behaviour</strong></th></tr>
+<tr><td>Stack (top of RAM)</td><td>Grows downward as functions are called</td></tr>
+<tr><td>... free gap ...</td><td>If stack and heap meet, the program crashes</td></tr>
+<tr><td>Heap</td><td>Grows upward as malloc is used</td></tr>
+<tr><td>.bss</td><td>Zero-initialised variables</td></tr>
+<tr><td>.data (bottom of RAM)</td><td>Initialised variables, copied from flash</td></tr>
+</table></div>
+<h2 id="12-3-what-happens-before-main-runs">12.3 What happens before main() runs</h2>
+<p>The CPU does not start at main. After power-on or reset it runs startup code:</p>
+<ol>
+<li>The CPU reads the vector table at a fixed address: the first entry is the initial stack pointer, the second is the address of the Reset handler.</li>
+<li>Reset_Handler starts. It sets up the stack pointer.</li>
+<li>It copies the initial values of .data from flash to RAM.</li>
+<li>It fills .bss with zeros. (This is why uninitialised globals are 0.)</li>
+<li>It sets up the clock and basic hardware (SystemInit on ARM).</li>
+<li>It calls main().</li>
+</ol>
+<p>The linker script (.ld file) decides the addresses of flash and RAM and where each section goes. You rarely write it as a beginner, but you should know it exists. In Arduino and ESP-IDF these steps are hidden inside the core.</p>
+<aside class="callout info" style="--c:#2A7F8E"><p><strong>Why interviewers ask this</strong></p>
+<p>It shows you understand why a global initialised to 5 survives reset, why uninitialised globals are zero, and why local variables contain garbage.</p></aside>
+<h2 id="12-4-stack-overflow">12.4 Stack overflow</h2>
+<ul>
+<li>Each function call and each local array uses stack. Large local arrays (char buf[2000]) or deep recursion can exhaust a small stack.</li>
+<li>The stack then overwrites other data, causing random crashes that are very hard to debug.</li>
+<li>Fixes: make big buffers global or static, avoid recursion, check stack usage (FreeRTOS: uxTaskGetStackHighWaterMark), increase task stack size.</li>
+</ul>
+<h2 id="12-5-structure-padding-recap-with-detail">12.5 Structure padding (recap with detail)</h2>
+<p>Processors prefer a 4-byte value at an address divisible by 4. The compiler adds padding to guarantee alignment.</p>
+<pre class="code"><code>struct A { char a; int b; char c; };   // offsets: a=0, b=4, c=8, size 12
+struct B { int b; char a; char c; };   // offsets: b=0, a=4, c=5, size 8
+ 
+// remove padding (slower access, not portable, may fault on some CPUs)
+struct __attribute__((packed)) P { char a; int b; char c; };   // size 6</code></pre>
+<p>Packed structs are useful for matching a communication packet byte by byte, but unaligned access can be slow or even cause a hardware fault on some ARM cores. Prefer ordering members largest first.</p>
+<h2 id="12-6-endianness">12.6 Endianness</h2>
+<p>A 32-bit number takes 4 bytes. Endianness is the order in which those bytes are stored.</p>
+<div class="tablewrap"><table>
+<tr><th></th><th><strong>Little-endian</strong></th><th><strong>Big-endian</strong></th></tr>
+<tr><td>Stores first</td><td>Least significant byte</td><td>Most significant byte</td></tr>
+<tr><td>0x12345678 in memory</td><td>78 56 34 12</td><td>12 34 56 78</td></tr>
+<tr><td>Used by</td><td>x86 PCs, ESP32, ESP8266, AVR, most ARM Cortex-M</td><td>Network byte order, some old CPUs</td></tr>
+</table></div>
+<aside class="callout info" style="--c:#2A7F8E"><p><strong>Analogy: writing a date</strong></p>
+<p>Little-endian is like writing 29-10-2026 (small unit first). Big-endian is like 2026-10-29 (biggest unit first). Both hold the same date; both sides must agree on the order.</p></aside>
+<pre class="code"><code>#include &lt;stdio.h&gt;
+#include &lt;stdint.h&gt;
+ 
+int main(void) {
+    uint32_t x = 0x12345678;
+    uint8_t *p = (uint8_t *)&amp;x;      // look at the first byte in memory
+ 
+    if (*p == 0x78) printf("Little-endian\n");
+    else            printf("Big-endian\n");
+    return 0;
+}</code></pre>
+<p><strong>Output:</strong></p>
+<pre class="code"><code>Little-endian</code></pre>
+<p>Endianness matters when you send multi-byte values over UART, I2C, SPI or a network, or read a binary file made on another system. Convert explicitly, for example by sending the high byte first: tx[0] = (value &gt;&gt; 8) &amp; 0xFF; tx[1] = value &amp; 0xFF;</p>
+<h2 id="common-mistakes-12">Common mistakes</h2>
+<div class="tablewrap"><table>
+<tr><th><strong>Mistake</strong></th><th><strong>Fix</strong></th></tr>
+<tr><td>Assuming local variables start at 0</td><td>They hold garbage; only globals and statics are zeroed</td></tr>
+<tr><td>Large arrays declared as locals</td><td>Make them static or global, or shrink them</td></tr>
+<tr><td>Assuming sizeof(struct) equals the sum of members</td><td>Print it, and order members by size</td></tr>
+<tr><td>Sending a struct directly over a network or SPI</td><td>Serialise field by field with a fixed byte order</td></tr>
+<tr><td>Ignoring heap and stack collision on tiny RAM</td><td>Track free memory and avoid dynamic allocation</td></tr>
+<tr><td>Assuming every system is little-endian</td><td>Convert explicitly when data crosses systems</td></tr>
+</table></div>
+<h2 id="practice-programs-type-each-one-yourself-12">Practice programs (type each one yourself)</h2>
+<ol>
+<li>Print the addresses of a global, a static, a local, a malloc block and a function; compare which are high and which are low.</li>
+<li>Run the endianness program on your PC and, with Serial.print, on your ESP32.</li>
+<li>Print sizeof and the offset of each member (offsetof from stddef.h) for struct A and B.</li>
+<li>Write functions to convert a uint32_t to 4 bytes in big-endian and little-endian order, and back.</li>
+<li>Run recursion until the stack overflows on your PC and note the depth.</li>
+<li>Use size or arm-none-eabi-size (or the Arduino build output) to read how much flash and RAM your sketch uses.</li>
+</ol>
+<h2 id="interview-questions-with-short-answers-12">Interview questions with short answers</h2>
+<p><strong>Q1. What are .text, .data and .bss? .text is code, .data is initialised globals, .bss is zero-initialised globals.</strong></p>
+<p><strong>Q2. Why are uninitialised globals zero? Startup code clears the .bss section before main.</strong></p>
+<p><strong>Q3. Where is a const global stored on a microcontroller? In flash (.rodata), not in RAM.</strong></p>
+<p><strong>Q4. What happens before main()? Reset handler: set stack pointer, copy .data, clear .bss, init clocks, call main.</strong></p>
+<p><strong>Q5. What is stack overflow? The stack grows into other memory because of deep calls or big locals.</strong></p>
+<p><strong>Q6. What is endianness? Which is ESP32? It is the byte order of multi-byte values; the ESP32 is little-endian.</strong></p>
+<p><strong>Q7. What is structure padding and how do you avoid wasting memory? Alignment gaps between members; order members from largest to smallest.</strong></p>
+<p><strong>TOPIC 13</strong></p>
+<h1 id="registers-memory-mapped-i-o-and-function-pointers">Registers, Memory-Mapped I/O and Function Pointers</h1>
+<aside class="callout info" style="--c:#2A7F8E"><p><strong>In one line</strong></p>
+<p>In a microcontroller, peripherals (GPIO, timers, UART) are controlled by writing numbers to special memory addresses called registers; C does this with volatile pointers to fixed addresses.</p></aside>
+<h2 id="13-1-what-is-a-register">13.1 What is a register?</h2>
+<p>A register is a small memory location, 8, 16 or 32 bits wide, that is connected to hardware instead of ordinary RAM. Writing to it changes hardware behaviour; reading it tells you the hardware state.</p>
+<aside class="callout info" style="--c:#2A7F8E"><p><strong>Analogy: the control panel of a machine</strong></p>
+<p>Every switch and gauge on the panel has a fixed position. Memory-mapped I/O means each switch and gauge has a fixed memory address. Writing to the address flips the switch; reading the address reads the gauge.</p></aside>
+<div class="tablewrap"><table>
+<tr><th><strong>Register type</strong></th><th><strong>Purpose</strong></th></tr>
+<tr><td>Control</td><td>Configure the peripheral (enable it, set mode, pick speed)</td></tr>
+<tr><td>Status</td><td>Hardware reports state (data ready, buffer empty, error)</td></tr>
+<tr><td>Data</td><td>Hold the data to send or the data received</td></tr>
+<tr><td>Direction (GPIO)</td><td>Choose input or output per pin</td></tr>
+<tr><td>Interrupt enable / flag</td><td>Turn interrupts on and show which one fired</td></tr>
+</table></div>
+<h2 id="13-2-accessing-a-fixed-address">13.2 Accessing a fixed address</h2>
+<p>The pattern is: cast the address to a pointer to volatile, then dereference.</p>
+<pre class="code"><code>// NOTE: 0x40020014 is an example address. Real addresses come from
+// the chip's reference manual or its header file.
+#define GPIOA_ODR   (*(volatile uint32_t *)0x40020014)
+ 
+GPIOA_ODR |=  (1U &lt;&lt; 5);     // set pin 5 high
+GPIOA_ODR &amp;= ~(1U &lt;&lt; 5);     // set pin 5 low
+GPIOA_ODR ^=  (1U &lt;&lt; 5);     // toggle pin 5</code></pre>
+<p>Read the macro from the inside out: 0x40020014 is a number; (volatile uint32_t *) says "treat it as the address of a volatile 32-bit value"; the leading * says "the value at that address". The macro therefore behaves like a variable that is really hardware.</p>
+<h2 id="13-3-grouping-registers-in-a-struct">13.3 Grouping registers in a struct</h2>
+<p>A peripheral usually has many registers in a row. A struct that matches the layout lets you name them (this is what vendor headers like STM32 CMSIS do).</p>
+<pre class="code"><code>typedef struct {
+    volatile uint32_t MODER;     // offset 0x00 : pin mode (input/output)
+    volatile uint32_t OTYPER;    // offset 0x04
+    volatile uint32_t OSPEEDR;   // offset 0x08
+    volatile uint32_t PUPDR;     // offset 0x0C
+    volatile uint32_t IDR;       // offset 0x10 : input data
+    volatile uint32_t ODR;       // offset 0x14 : output data
+} GPIO_TypeDef;
+ 
+#define GPIOA ((GPIO_TypeDef *)0x40020000)
+ 
+GPIOA-&gt;MODER |= (1U &lt;&lt; (5 * 2));   // pin 5 as output (2 bits per pin)
+GPIOA-&gt;ODR   ^= (1U &lt;&lt; 5);          // toggle pin 5
+if (GPIOA-&gt;IDR &amp; (1U &lt;&lt; 0)) { /* pin 0 is high */ }</code></pre>
+<h2 id="13-4-practice-safely-simulate-a-register-on-a-pc">13.4 Practice safely: simulate a register on a PC</h2>
+<p>You can test all the bit logic without hardware by pointing at a normal variable.</p>
+<pre class="code"><code>#include &lt;stdio.h&gt;
+#include &lt;stdint.h&gt;
+ 
+static volatile uint32_t fake_odr = 0;          // pretend hardware register
+#define ODR (*(&amp;fake_odr))
+ 
+#define LED_PIN 5
+ 
+int main(void) {
+    ODR |= (1U &lt;&lt; LED_PIN);                      // LED on
+    printf("ODR = 0x%08X\n", (unsigned)ODR);
+    ODR ^= (1U &lt;&lt; LED_PIN);                      // toggle -&gt; off
+    printf("ODR = 0x%08X\n", (unsigned)ODR);
+    return 0;
+}</code></pre>
+<p><strong>Output:</strong></p>
+<pre class="code"><code>ODR = 0x00000020
+ODR = 0x00000000</code></pre>
+<h2 id="13-5-read-modify-write-and-its-risks">13.5 Read-modify-write and its risks</h2>
+<p>ODR |= mask looks like one operation, but the CPU does three: read the register, change the bits, write it back. If an interrupt changes the same register between the read and the write, its change is lost. Solutions: disable interrupts around it, or use hardware set and clear registers (BSRR on STM32, set/clear registers on ESP32 such as GPIO_OUT_W1TS and GPIO_OUT_W1TC) that change a bit with one write.</p>
+<h2 id="13-6-function-pointers-and-callbacks">13.6 Function pointers and callbacks</h2>
+<p>A function pointer stores the address of a function. Embedded software uses them to let low-level drivers call back into your application code.</p>
+<pre class="code"><code>typedef void (*ButtonCallback)(void);
+ 
+static ButtonCallback on_press = NULL;
+ 
+void button_register(ButtonCallback cb) {      // driver API
+    on_press = cb;
+}
+ 
+void button_isr(void) {                        // driver calls your code
+    if (on_press != NULL) on_press();
+}
+ 
+void my_handler(void) { printf("Button pressed!\n"); }   // application code
+ 
+int main(void) {
+    button_register(my_handler);
+    button_isr();                               // simulate an interrupt
+    return 0;
+}</code></pre>
+<p><strong>Output:</strong></p>
+<pre class="code"><code>Button pressed!</code></pre>
+<p>The driver does not need to know what your application does, and your application does not need to know how the button is read. This separation is the heart of clean driver design.</p>
+<h2 id="13-7-table-of-function-pointers-jump-table">13.7 Table of function pointers (jump table)</h2>
+<pre class="code"><code>void cmd_on(void)  { printf("LED on\n"); }
+void cmd_off(void) { printf("LED off\n"); }
+void cmd_blink(void) { printf("LED blink\n"); }
+ 
+void (*commands[])(void) = { cmd_on, cmd_off, cmd_blink };
+ 
+int index = 1;                          // received from UART, for example
+if (index &gt;= 0 &amp;&amp; index &lt; 3)            // validate before using
+    commands[index]();                  // calls cmd_off</code></pre>
+<p><strong>Output:</strong></p>
+<pre class="code"><code>LED off</code></pre>
+<p>The interrupt vector table on an ARM chip is the same idea: an array of function addresses, one for each interrupt source.</p>
+<h2 id="common-mistakes-13">Common mistakes</h2>
+<div class="tablewrap"><table>
+<tr><th><strong>Mistake</strong></th><th><strong>Fix</strong></th></tr>
+<tr><td>Forgetting volatile on register pointers</td><td>Always cast to volatile</td></tr>
+<tr><td>Using the wrong width (uint8_t for a 32-bit register)</td><td>Match the register width in the datasheet</td></tr>
+<tr><td>Overwriting a register with = instead of |= or &amp;=</td><td>Change only the bits you intend</td></tr>
+<tr><td>Using an address from memory or the wrong chip</td><td>Take addresses from the reference manual or vendor headers</td></tr>
+<tr><td>Calling a NULL function pointer</td><td>Check for NULL, or provide a default handler</td></tr>
+<tr><td>Index out of range in a function pointer table</td><td>Validate the index before calling</td></tr>
+</table></div>
+<h2 id="practice-programs-type-each-one-yourself-13">Practice programs (type each one yourself)</h2>
+<ol>
+<li>Simulate a GPIO output register with a variable and write set, clear, toggle functions.</li>
+<li>Create a struct that overlays a fake UART with CTRL, STATUS and DATA registers and write init and send functions that use it.</li>
+<li>Write a menu program with an array of function pointers (add, sub, mul, div).</li>
+<li>Implement a button driver with a callback and a main program that registers two different handlers.</li>
+<li>Find the register definitions for your board (ESP32 or Arduino) and write down the address of GPIO output registers.</li>
+<li>Blink pin 13 on an Uno using DDRB and PORTB only (no pinMode or digitalWrite).</li>
+</ol>
+<h2 id="interview-questions-with-short-answers-13">Interview questions with short answers</h2>
+<p><strong>Q1. What is memory-mapped I/O? Peripheral registers are placed in the normal address space, so you control hardware with ordinary reads and writes.</strong></p>
+<p><strong>Q2. Explain *(volatile uint32_t *)0x40020014 = 1; Treat the number as the address of a volatile 32-bit value and write 1 there.</strong></p>
+<p><strong>Q3. Why must register pointers be volatile? The hardware can change the value and every access has an effect, so the compiler must not cache or remove accesses.</strong></p>
+<p><strong>Q4. Why is read-modify-write dangerous? An interrupt between the read and the write can be overwritten; use atomic set/clear registers or disable interrupts.</strong></p>
+<p><strong>Q5. What is a callback? A function you pass to a driver so that the driver calls it when an event happens.</strong></p>
+<p><strong>Q6. What is the interrupt vector table? An array of function addresses, one per interrupt source, used by the CPU to jump to the right handler.</strong></p>
+<p><strong>TOPIC 14</strong></p>
+<h1 id="gpio-and-debouncing">GPIO and Debouncing</h1>
+<aside class="callout info" style="--c:#2A7F8E"><p><strong>In one line</strong></p>
+<p>GPIO (General Purpose Input/Output) pins let the microcontroller read buttons and drive LEDs; debouncing removes the false presses caused by a mechanical switch's contacts bouncing.</p></aside>
+<h2 id="14-1-what-is-a-gpio-pin">14.1 What is a GPIO pin?</h2>
+<p>A pin you can configure in software as an input (read high or low) or an output (drive high or low). High means close to the supply voltage (3.3 V on ESP32 and ESP8266, 5 V on Arduino Uno); low means 0 V.</p>
+<div class="tablewrap"><table>
+<tr><th><strong>Mode</strong></th><th><strong>Meaning</strong></th></tr>
+<tr><td>Input</td><td>Pin listens. Reads 1 if voltage is high, 0 if low</td></tr>
+<tr><td>Input with pull-up</td><td>Internal resistor pulls the pin to high when nothing drives it</td></tr>
+<tr><td>Input with pull-down</td><td>Internal resistor pulls the pin to low when nothing drives it</td></tr>
+<tr><td>Output push-pull</td><td>Pin actively drives both high and low (normal LED output)</td></tr>
+<tr><td>Output open-drain</td><td>Pin can only pull low; a pull-up resistor makes high (I2C uses this)</td></tr>
+</table></div>
+<h2 id="14-2-floating-inputs-and-pull-up-resistors">14.2 Floating inputs and pull-up resistors</h2>
+<aside class="callout info" style="--c:#2A7F8E"><p><strong>Analogy: a door that needs a spring</strong></p>
+<p>A door with no spring flaps open and shut in the wind. An input pin that is connected to nothing (floating) picks up noise and reads random 0s and 1s. A pull-up or pull-down resistor is the spring that holds the pin in a known state.</p></aside>
+<p>Common button wiring: connect the button between the pin and GND and enable the internal pull-up. Not pressed: pin reads HIGH. Pressed: pin reads LOW. This is called active-low and needs no external resistor.</p>
+<aside class="callout warn" style="--c:#C0392B"><p><strong>ESP32 pin note</strong></p>
+<p>GPIO 34 to 39 on the ESP32 are input only and have no internal pull-up or pull-down. Use an external resistor there. Also avoid pins used for boot (such as GPIO 0, 2, 12 and 15) for buttons until you read the datasheet.</p></aside>
+<h2 id="14-3-output-driving-an-led">14.3 Output: driving an LED</h2>
+<pre class="code"><code>const int LED_PIN = 2;
+ 
+void setup() {
+    pinMode(LED_PIN, OUTPUT);
+}
+ 
+void loop() {
+    digitalWrite(LED_PIN, HIGH);
+    delay(500);
+    digitalWrite(LED_PIN, LOW);
+    delay(500);
+}</code></pre>
+<p>Always use a series resistor with an external LED. Example: supply 3.3 V, LED drop 2.0 V, wanted current 10 mA. R = (3.3 - 2.0) / 0.010 = 130 ohm. Use the next standard value, 150 or 220 ohm. Without a resistor the LED (or the pin) burns out.</p>
+<ul>
+<li>Keep the current per pin small (a few mA up to about 10 mA is a safe habit). Check the datasheet limit.</li>
+<li>For motors, relays and solenoids, never connect them directly to a pin. Use a transistor, MOSFET or driver module (L298, ULN2003) with a separate supply and a flyback diode.</li>
+</ul>
+<h2 id="14-4-input-reading-a-button">14.4 Input: reading a button</h2>
+<pre class="code"><code>const int BTN_PIN = 4;
+const int LED_PIN = 2;
+ 
+void setup() {
+    pinMode(BTN_PIN, INPUT_PULLUP);    // pressed = LOW
+    pinMode(LED_PIN, OUTPUT);
+}
+ 
+void loop() {
+    if (digitalRead(BTN_PIN) == LOW)   // button pressed
+        digitalWrite(LED_PIN, HIGH);
+    else
+        digitalWrite(LED_PIN, LOW);
+}</code></pre>
+<h2 id="14-5-switch-bounce">14.5 Switch bounce</h2>
+<p>A mechanical button is two pieces of metal. When they touch, they vibrate and make and break contact many times for about 1 to 20 milliseconds before settling. The microcontroller is fast enough to see every one of these as a separate press.</p>
+<div class="tablewrap"><table>
+<tr><th><strong>What you do</strong></th><th><strong>What the pin sees</strong></th><th><strong>What your code may think</strong></th></tr>
+<tr><td>One press</td><td>HIGH, LOW, HIGH, LOW, HIGH, LOW (settles)</td><td>3 presses</td></tr>
+<tr><td>One release</td><td>LOW, HIGH, LOW, HIGH (settles)</td><td>2 releases</td></tr>
+</table></div>
+<p>The result: a counter that jumps by 3 or a toggle that flips randomly. Debouncing makes one physical press produce exactly one event.</p>
+<h2 id="14-6-software-debouncing-without-blocking">14.6 Software debouncing without blocking</h2>
+<p>The simple fix delay(20) after a press blocks the whole program. A better method: accept a new value only if it has stayed the same for a debounce time, using millis() for timing.</p>
+<pre class="code"><code>const int BTN_PIN = 4;
+const unsigned long DEBOUNCE_MS = 30;
+ 
+int stableState   = HIGH;      // debounced state of the button
+int lastReading   = HIGH;      // raw reading from the previous loop
+unsigned long lastChange = 0;  // when the raw reading last changed
+int pressCount = 0;
+ 
+void setup() {
+    pinMode(BTN_PIN, INPUT_PULLUP);
+    Serial.begin(115200);
+}
+ 
+void loop() {
+    int reading = digitalRead(BTN_PIN);
+ 
+    if (reading != lastReading) {          // raw value changed: restart timer
+        lastChange = millis();
+        lastReading = reading;
+    }
+ 
+    if ((millis() - lastChange) &gt; DEBOUNCE_MS &amp;&amp; reading != stableState) {
+        stableState = reading;             // it stayed stable long enough
+        if (stableState == LOW) {          // falling edge = real press
+            pressCount++;
+            Serial.println(pressCount);
+        }
+    }
+}</code></pre>
+<p>The program stays free to do other work in loop() because nothing waits. The trick: millis() - lastChange measures how long the raw reading has stayed the same.</p>
+<h2 id="14-7-edge-detection-act-on-the-change-not-the-level">14.7 Edge detection: act on the change, not the level</h2>
+<ul>
+<li>Level: "the button IS pressed". If you toggle an LED while it is pressed, it flickers thousands of times per second.</li>
+<li>Edge: "the button WAS JUST pressed". Compare the current stable state with the previous one and act once.</li>
+<li>Falling edge = HIGH to LOW (press with pull-up). Rising edge = LOW to HIGH (release).</li>
+</ul>
+<h2 id="14-8-other-debounce-methods">14.8 Other debounce methods</h2>
+<div class="tablewrap"><table>
+<tr><th><strong>Method</strong></th><th><strong>Notes</strong></th></tr>
+<tr><td>Hardware RC filter + Schmitt trigger</td><td>Resistor and capacitor smooth the signal; no code needed; uses parts</td></tr>
+<tr><td>Timer sampling</td><td>Read the pin every 5 ms in a timer interrupt; count consecutive equal samples</td></tr>
+<tr><td>Shift-register debounce</td><td>Shift each sample into a byte; accept a press when the byte equals 0x00 or 0xFF</td></tr>
+<tr><td>Libraries</td><td>Bounce2 on Arduino; but understand the method first</td></tr>
+</table></div>
+<h2 id="common-mistakes-14">Common mistakes</h2>
+<div class="tablewrap"><table>
+<tr><th><strong>Mistake</strong></th><th><strong>Fix</strong></th></tr>
+<tr><td>Leaving an input floating</td><td>Enable INPUT_PULLUP or add a resistor</td></tr>
+<tr><td>Connecting an LED without a resistor</td><td>Calculate R = (Vsupply - Vled) / I</td></tr>
+<tr><td>Driving a motor or relay straight from a GPIO</td><td>Use a transistor or driver and a flyback diode</td></tr>
+<tr><td>Confusing active-low and active-high logic</td><td>Write down: pressed = LOW with pull-up</td></tr>
+<tr><td>Using delay() to debounce in a larger program</td><td>Use millis-based timing</td></tr>
+<tr><td>Feeding 5 V into a 3.3 V ESP pin</td><td>Use a level shifter or a voltage divider</td></tr>
+</table></div>
+<h2 id="practice-programs-type-each-one-yourself-14">Practice programs (type each one yourself)</h2>
+<ol>
+<li>Blink an LED with delay, then without delay using millis.</li>
+<li>Turn an LED on while a button is held, using INPUT_PULLUP.</li>
+<li>Toggle an LED on each press with edge detection; first without debouncing and watch it misbehave.</li>
+<li>Add software debouncing and count presses on the serial monitor.</li>
+<li>Make a 4-LED chaser; a button changes direction.</li>
+<li>Detect a short press and a long press (over 1 second) on the same button.</li>
+</ol>
+<h2 id="interview-questions-with-short-answers-14">Interview questions with short answers</h2>
+<p><strong>Q1. What is a pull-up resistor? A resistor that holds an input at a high level when nothing else drives it.</strong></p>
+<p><strong>Q2. What is a floating pin? An unconnected or undriven input that reads random values from noise.</strong></p>
+<p><strong>Q3. Push-pull vs open-drain? Push-pull drives both high and low; open-drain only pulls low and needs an external pull-up.</strong></p>
+<p><strong>Q4. What is switch bounce and how do you fix it? Contacts make and break rapidly for milliseconds; fix with a hardware RC filter or software timing.</strong></p>
+<p><strong>Q5. Why not use delay() for debouncing? It blocks the processor, so other tasks stop.</strong></p>
+<p><strong>Q6. How do you calculate an LED resistor? R = (supply voltage - LED forward voltage) / desired current.</strong></p>
+<p><strong>TOPIC 15</strong></p>
+<h1 id="interrupts-and-isr">Interrupts and ISR</h1>
+<aside class="callout info" style="--c:#2A7F8E"><p><strong>In one line</strong></p>
+<p>An interrupt makes the CPU pause its normal work, run a short function (ISR) to deal with an urgent event, and then continue exactly where it stopped.</p></aside>
+<h2 id="15-1-polling-vs-interrupts">15.1 Polling vs interrupts</h2>
+<aside class="callout info" style="--c:#2A7F8E"><p><strong>Analogy: waiting for a visitor</strong></p>
+<p>Polling is walking to the door every few seconds to see if someone is there. An interrupt is a doorbell: you work normally, and when it rings you go to the door, then return to your work.</p></aside>
+<div class="tablewrap"><table>
+<tr><th></th><th><strong>Polling</strong></th><th><strong>Interrupt</strong></th></tr>
+<tr><td>Reaction time</td><td>Depends on how often you check</td><td>Very fast, hardware triggered</td></tr>
+<tr><td>CPU use</td><td>Wastes time checking</td><td>Uses CPU only when needed</td></tr>
+<tr><td>Complexity</td><td>Simple</td><td>Needs care (shared data, timing)</td></tr>
+<tr><td>Good for</td><td>Slow, non-urgent inputs</td><td>Urgent events, short pulses, communication, wake from sleep</td></tr>
+</table></div>
+<h2 id="15-2-what-happens-when-an-interrupt-fires">15.2 What happens when an interrupt fires</h2>
+<ol>
+<li>A peripheral raises an interrupt request (button edge, timer overflow, byte received).</li>
+<li>If interrupts are enabled and the priority is high enough, the CPU finishes the current instruction.</li>
+<li>The CPU saves the context: program counter and key registers are pushed onto the stack.</li>
+<li>It looks up the address of the handler in the interrupt vector table and jumps to the ISR.</li>
+<li>The ISR runs and clears the interrupt flag if required.</li>
+<li>The CPU restores the saved context and continues the main program as if nothing happened.</li>
+</ol>
+<p>The delay between the event and the first ISR instruction is the interrupt latency. Keeping ISRs short keeps latency for other interrupts low.</p>
+<h2 id="15-3-the-golden-rules-of-an-isr">15.3 The golden rules of an ISR</h2>
+<div class="tablewrap"><table>
+<tr><th><strong>Rule</strong></th><th><strong>Reason</strong></th></tr>
+<tr><td>Keep it short and fast</td><td>While an ISR runs, other work and (often) other interrupts wait</td></tr>
+<tr><td>No delay(), no waiting loops</td><td>The timer that delay depends on may be blocked; the system freezes</td></tr>
+<tr><td>No printf or Serial.print</td><td>They are slow, may use interrupts themselves and are not safe here</td></tr>
+<tr><td>No malloc / free</td><td>Not re-entrant and unpredictable in time</td></tr>
+<tr><td>Do not call functions that block</td><td>Anything that waits can hang the whole program</td></tr>
+<tr><td>Share data through volatile variables</td><td>Otherwise the compiler may never see the change</td></tr>
+<tr><td>Set a flag or push data to a buffer, process in main</td><td>Work in the ISR, think in main</td></tr>
+</table></div>
+<h2 id="15-4-example-button-interrupt-with-a-flag">15.4 Example: button interrupt with a flag</h2>
+<pre class="code"><code>const int BTN_PIN = 4;
+volatile bool buttonFlag = false;          // shared with the ISR: volatile
+volatile unsigned long lastIsrTime = 0;
+ 
+void IRAM_ATTR onButton() {                // ESP32: ISR must live in IRAM
+    unsigned long now = millis();
+    if (now - lastIsrTime &gt; 50) {          // ignore bounces within 50 ms
+        buttonFlag = true;                 // just set a flag
+        lastIsrTime = now;
+    }
+}
+ 
+void setup() {
+    Serial.begin(115200);
+    pinMode(BTN_PIN, INPUT_PULLUP);
+    attachInterrupt(digitalPinToInterrupt(BTN_PIN), onButton, FALLING);
+}
+ 
+void loop() {
+    if (buttonFlag) {                      // main code does the real work
+        buttonFlag = false;
+        Serial.println("Button pressed");
+    }
+    // other tasks keep running here
+}</code></pre>
+<ul>
+<li>IRAM_ATTR is for ESP32 and ESP8266 (ICACHE_RAM_ATTR on older ESP8266 cores). It keeps the ISR in fast RAM so it can run while flash is busy. On an Arduino Uno you omit it.</li>
+<li>FALLING, RISING, CHANGE choose which edge triggers the interrupt. LOW triggers repeatedly while the pin is low.</li>
+<li>On an Uno only pins 2 and 3 support external interrupts. On ESP32 almost every GPIO does.</li>
+</ul>
+<h2 id="15-5-race-conditions-and-atomic-access">15.5 Race conditions and atomic access</h2>
+<p>A race condition happens when main code and an ISR use the same data and the result depends on timing.</p>
+<aside class="callout info" style="--c:#2A7F8E"><p><strong>Example of the problem</strong></p>
+<p>An 8-bit AVR reads a 16-bit variable in two steps. If an interrupt changes the variable between the two reads, main gets the low byte of the old value and the high byte of the new value: a number that never existed.</p></aside>
+<pre class="code"><code>volatile uint16_t pulseCount = 0;      // incremented in an ISR
+ 
+uint16_t readCount(void) {
+    noInterrupts();                    // start critical section
+    uint16_t copy = pulseCount;        // read safely
+    interrupts();                      // end critical section
+    return copy;
+}</code></pre>
+<p>Keep critical sections as short as possible. On 32-bit chips a 32-bit read is a single instruction and is already atomic, but read-modify-write sequences like count++ still are not.</p>
+<h2 id="15-6-priority-nesting-and-flags">15.6 Priority, nesting and flags</h2>
+<ul>
+<li>Each interrupt source has a priority. A higher priority interrupt can pre-empt a lower one if nesting is enabled (ARM Cortex-M NVIC supports it).</li>
+<li>Many peripherals have an interrupt flag that you must clear in the ISR; otherwise the ISR is called again immediately.</li>
+<li>Global enable: noInterrupts() or interrupts() on Arduino; __disable_irq() and __enable_irq() on ARM.</li>
+<li>Each source also has its own enable bit, so you can turn on only the interrupts you need.</li>
+</ul>
+<h2 id="15-7-using-the-avr-timer-interrupt-uno">15.7 Using the AVR timer interrupt (Uno)</h2>
+<pre class="code"><code>volatile unsigned long ticks = 0;
+ 
+ISR(TIMER2_COMPA_vect) {      // ISR macro from avr/interrupt.h
+    ticks++;
+}</code></pre>
+<p>The Timer topic (16) shows how to configure this timer so the ISR fires every millisecond.</p>
+<h2 id="common-mistakes-15">Common mistakes</h2>
+<div class="tablewrap"><table>
+<tr><th><strong>Mistake</strong></th><th><strong>Fix</strong></th></tr>
+<tr><td>Not declaring shared variables volatile</td><td>Add volatile for everything the ISR and main both use</td></tr>
+<tr><td>Calling Serial.print or delay inside an ISR</td><td>Set a flag and print in loop()</td></tr>
+<tr><td>Long processing inside the ISR</td><td>Store data and exit quickly; process in main</td></tr>
+<tr><td>Not debouncing a button interrupt</td><td>Ignore interrupts that come within a few tens of milliseconds</td></tr>
+<tr><td>Reading multi-byte shared data without protection</td><td>Disable interrupts briefly while copying</td></tr>
+<tr><td>Forgetting IRAM_ATTR on ESP32 ISRs</td><td>Add it; otherwise random crashes may occur</td></tr>
+</table></div>
+<h2 id="practice-programs-type-each-one-yourself-15">Practice programs (type each one yourself)</h2>
+<ol>
+<li>Toggle an LED from a button interrupt using a flag handled in loop().</li>
+<li>Count pulses from a button or sensor in an ISR and print the count every second.</li>
+<li>Show the race condition: read a 16-bit counter with and without noInterrupts on an Uno.</li>
+<li>Measure the time between two button presses using micros() inside the ISR.</li>
+<li>Build a stopwatch with start and stop buttons, both using interrupts.</li>
+<li>Wake an ESP32 from deep sleep with a button on an RTC-capable pin.</li>
+</ol>
+<h2 id="interview-questions-with-short-answers-15">Interview questions with short answers</h2>
+<p><strong>Q1. What is an interrupt? A hardware signal that makes the CPU pause, run a handler and then resume.</strong></p>
+<p><strong>Q2. What is an ISR and what rules does it follow? The handler function; keep it short, no blocking or printing, use volatile shared data.</strong></p>
+<p><strong>Q3. Why not call printf in an ISR? It is slow, may block and is not re-entrant.</strong></p>
+<p><strong>Q4. What is interrupt latency? The time from the event to the first instruction of the ISR.</strong></p>
+<p><strong>Q5. What is a race condition? A bug where the result depends on the timing between an ISR and main code accessing shared data.</strong></p>
+<p><strong>Q6. Polling vs interrupt: when to use which? Polling for simple, slow, non-urgent inputs; interrupts for urgent or short events and to save power.</strong></p>
+<p><strong>Q7. What is the vector table? A table of handler addresses, one per interrupt source.</strong></p>
+<p><strong>TOPIC 16</strong></p>
+<h1 id="timers-pwm-and-adc">Timers, PWM and ADC</h1>
+<aside class="callout info" style="--c:#2A7F8E"><p><strong>In one line</strong></p>
+<p>A timer counts clock ticks to measure and create precise time; PWM uses fast on-off switching to control power; an ADC converts a real-world voltage into a number.</p></aside>
+<h2 id="16-1-timers">16.1 Timers</h2>
+<p>A hardware timer is a counter that increases by one on every tick of a clock, completely independent of your program. It can raise an interrupt on overflow or when it reaches a chosen compare value.</p>
+<aside class="callout info" style="--c:#2A7F8E"><p><strong>Analogy: a kitchen timer</strong></p>
+<p>You set the number of minutes, go on cooking, and it rings at the right time. A hardware timer keeps counting while the CPU does other jobs.</p></aside>
+<p>Key terms:</p>
+<ul>
+<li>Clock: the source, for example 16 MHz on the Uno or 80 MHz APB clock on an ESP32.</li>
+<li>Prescaler: divides the clock to make slower ticks. Timer clock = system clock / prescaler.</li>
+<li>Overflow: the counter reaches its maximum (255 for 8-bit, 65535 for 16-bit) and wraps to 0.</li>
+<li>Compare match: the counter equals a value you chose; used to create exact periods.</li>
+</ul>
+<p>How to calculate a period, step by step (Uno: 16 MHz clock, want 1 ms):</p>
+<ol>
+<li>Choose prescaler 64: timer clock = 16,000,000 / 64 = 250,000 ticks per second.</li>
+<li>One tick lasts 1 / 250,000 = 4 microseconds.</li>
+<li>1 ms = 1000 us needs 1000 / 4 = 250 ticks.</li>
+<li>The counter counts from 0, so set the compare value to 250 - 1 = 249.</li>
+</ol>
+<pre class="code"><code>// Arduino Uno: Timer2 generates an interrupt every 1 ms
+volatile unsigned long ms = 0;
+ 
+void setup() {
+    noInterrupts();
+    TCCR2A = (1 &lt;&lt; WGM21);                  // CTC mode: clear counter on match
+    TCCR2B = (1 &lt;&lt; CS22);                   // prescaler 64
+    OCR2A  = 249;                           // compare value
+    TIMSK2 = (1 &lt;&lt; OCIE2A);                 // enable compare-match interrupt
+    interrupts();
+}
+ 
+ISR(TIMER2_COMPA_vect) {
+    ms++;                                   // runs every 1 ms
+}
+ 
+void loop() {
+    // use ms as a millisecond clock here
+}</code></pre>
+<p>This register-level code is for the Uno (AVR). Using Timer2 leaves Timer0 free for millis() and delay(), but tone() also uses Timer2. On ESP32 and ESP8266 the timer API differs between core versions, so check the documentation of the core you installed. The calculation is the same on every chip.</p>
+<h2 id="16-2-non-blocking-timing-with-millis">16.2 Non-blocking timing with millis()</h2>
+<pre class="code"><code>unsigned long previous = 0;
+const unsigned long INTERVAL = 1000;     // 1 second
+bool ledOn = false;
+ 
+void loop() {
+    unsigned long now = millis();
+    if (now - previous &gt;= INTERVAL) {    // subtraction is safe when millis() wraps
+        previous = now;
+        ledOn = !ledOn;
+        digitalWrite(2, ledOn);
+    }
+    // loop keeps running: read sensors, check buttons...
+}</code></pre>
+<h2 id="16-3-pwm-pulse-width-modulation">16.3 PWM: Pulse Width Modulation</h2>
+<p>PWM switches a pin on and off very fast. The fraction of time it is ON is the duty cycle. A load that cannot follow such fast changes (an LED to the eye, a motor with inertia) sees the average.</p>
+<div class="tablewrap"><table>
+<tr><th><strong>Duty cycle</strong></th><th><strong>Average voltage (3.3 V)</strong></th><th><strong>Effect</strong></th></tr>
+<tr><td>0%</td><td>0 V</td><td>Always off</td></tr>
+<tr><td>25%</td><td>0.83 V</td><td>Dim LED, slow motor</td></tr>
+<tr><td>50%</td><td>1.65 V</td><td>Half brightness or speed</td></tr>
+<tr><td>75%</td><td>2.48 V</td><td>Bright</td></tr>
+<tr><td>100%</td><td>3.3 V</td><td>Always on</td></tr>
+</table></div>
+<ul>
+<li>Duty cycle (%) = ON time / total period x 100.</li>
+<li>Frequency = 1 / period. LED dimming works well above about 500 Hz (no visible flicker). Motors often use 1 to 20 kHz.</li>
+<li>Resolution = number of steps. 8-bit PWM has 256 levels (0 to 255); 10-bit has 1024.</li>
+<li>Arduino Uno: analogWrite(pin, 0 to 255) on PWM pins 3, 5, 6, 9, 10, 11 (marked with ~).</li>
+<li>ESP32: the LEDC peripheral gives PWM on any output pin. The function names changed between Arduino-ESP32 core versions 2 and 3, so follow the documentation for your installed version.</li>
+</ul>
+<pre class="code"><code>// Arduino Uno: fade an LED on pin 9
+int brightness = 0;
+int step = 5;
+ 
+void setup() { pinMode(9, OUTPUT); }
+ 
+void loop() {
+    analogWrite(9, brightness);            // 0 = off, 255 = full
+    brightness += step;
+    if (brightness &lt;= 0 || brightness &gt;= 255) step = -step;
+    delay(20);
+}</code></pre>
+<p>Servo motors use a specific PWM: 50 Hz (20 ms period) with a pulse of 1 ms (one end), 1.5 ms (centre) and 2 ms (other end). Use a Servo library so the timing is exact.</p>
+<h2 id="16-4-adc-analog-to-digital-converter">16.4 ADC: Analog to Digital Converter</h2>
+<p>The world is analog: temperature, light, sound and battery level are smoothly changing voltages. The CPU understands numbers. The ADC measures a voltage and returns a number.</p>
+<div class="tablewrap"><table>
+<tr><th><strong>Board</strong></th><th><strong>Resolution</strong></th><th><strong>Count range</strong></th><th><strong>Input range</strong></th></tr>
+<tr><td>Arduino Uno</td><td>10 bit</td><td>0 to 1023</td><td>0 to 5 V</td></tr>
+<tr><td>ESP32</td><td>12 bit</td><td>0 to 4095</td><td>about 0 to 3.3 V</td></tr>
+<tr><td>ESP8266 (NodeMCU A0)</td><td>10 bit</td><td>0 to 1023</td><td>0 to 3.3 V (board divider)</td></tr>
+</table></div>
+<p>Conversion formula (using the full-scale count):</p>
+<aside class="callout info" style="--c:#2A7F8E"><p><strong>voltage = count x Vref / maxCount</strong></p>
+<p>Example (Uno): count 512, Vref 5 V, max 1023: voltage = 512 x 5 / 1023 = 2.50 V.</p>
+<p>Resolution (step size) = Vref / 2^N. A 10-bit ADC at 5 V has steps of about 4.9 mV; a 12-bit ADC at 3.3 V has steps of about 0.8 mV.</p></aside>
+<pre class="code"><code>// Read an LM35 temperature sensor (10 mV per degree C) on an Uno
+const int SENSOR = A0;
+ 
+void setup() { Serial.begin(9600); }
+ 
+void loop() {
+    int count = analogRead(SENSOR);               // 0 to 1023
+    float volts = count * 5.0f / 1023.0f;
+    float tempC = volts * 100.0f;                 // 10 mV per degree
+    Serial.println(tempC);
+    delay(1000);
+}</code></pre>
+<h2 id="16-5-getting-clean-adc-readings">16.5 Getting clean ADC readings</h2>
+<ul>
+<li>Noise: average several samples (for example 16) or use a moving average.</li>
+<li>Keep analog wires short, and add a 0.1 uF capacitor close to the sensor.</li>
+<li>Reference voltage: the result is only as accurate as Vref. A battery-powered board can have a drifting 5 V or 3.3 V supply.</li>
+<li>ESP32 notes: the ADC is not perfectly linear (use calibration functions), and ADC2 channels cannot be used while Wi-Fi is on. Prefer ADC1 pins (GPIO 32 to 39) in Wi-Fi projects.</li>
+<li>Never apply more than the maximum input voltage (3.3 V on ESP boards) to an ADC pin. Use a voltage divider for higher voltages.</li>
+</ul>
+<pre class="code"><code>int readAveraged(int pin, int samples) {
+    long sum = 0;
+    for (int i = 0; i &lt; samples; i++) {
+        sum += analogRead(pin);
+        delay(2);
+    }
+    return (int)(sum / samples);
+}</code></pre>
+<h2 id="common-mistakes-16">Common mistakes</h2>
+<div class="tablewrap"><table>
+<tr><th><strong>Mistake</strong></th><th><strong>Fix</strong></th></tr>
+<tr><td>Using delay() for all timing</td><td>Use millis() or hardware timers</td></tr>
+<tr><td>Forgetting that counters start at 0 (compare value off by one)</td><td>Use ticks - 1</td></tr>
+<tr><td>Comparing millis() values as absolute times</td><td>Use now - previous &gt;= interval</td></tr>
+<tr><td>Expecting analogWrite to give a true analog voltage</td><td>It is PWM; add an RC filter if you need a smooth voltage</td></tr>
+<tr><td>Feeding more than 3.3 V into an ESP ADC pin</td><td>Use a voltage divider</td></tr>
+<tr><td>Using int for a time that overflows quickly</td><td>Use unsigned long</td></tr>
+</table></div>
+<h2 id="practice-programs-type-each-one-yourself-16">Practice programs (type each one yourself)</h2>
+<ol>
+<li>Calculate by hand the compare value for a 10 ms timer at 16 MHz with prescaler 1024.</li>
+<li>Blink two LEDs at different rates using millis() with no delay().</li>
+<li>Fade an LED with PWM and display the duty cycle percentage on the serial monitor.</li>
+<li>Control the LED brightness with a potentiometer (ADC input, PWM output).</li>
+<li>Read a temperature or light sensor, average 16 samples, and print the voltage and value.</li>
+<li>Make a simple voltmeter that reads 0 to 3.3 V through a divider and prints the real input voltage.</li>
+<li>Drive a hobby servo to 0, 90 and 180 degrees.</li>
+</ol>
+<h2 id="interview-questions-with-short-answers-16">Interview questions with short answers</h2>
+<p><strong>Q1. What is a prescaler? A divider that slows the clock fed to a timer so it can count longer periods.</strong></p>
+<p><strong>Q2. How do you get a 1 ms interrupt from a 16 MHz clock? Prescaler 64 gives 250 kHz; count 250 ticks; compare value 249 in CTC mode.</strong></p>
+<p><strong>Q3. What is PWM and what is duty cycle? Fast on-off switching; duty cycle is the percentage of the period the signal is high.</strong></p>
+<p><strong>Q4. How is the average voltage of a PWM signal calculated? Duty cycle x supply voltage.</strong></p>
+<p><strong>Q5. What is the resolution of a 12-bit ADC with 3.3 V reference? 3.3 / 4096 which is about 0.8 mV per step.</strong></p>
+<p><strong>Q6. Why use millis() instead of delay()? millis() lets the program do other tasks while waiting.</strong></p>
+<p><strong>Q7. How can you reduce ADC noise? Average multiple samples, add a capacitor, keep wires short and use a stable reference.</strong></p>
+<p><strong>TOPIC 17</strong></p>
+<h1 id="communication-protocols-uart-i2c-and-spi">Communication Protocols: UART, I2C and SPI</h1>
+<aside class="callout info" style="--c:#2A7F8E"><p><strong>In one line</strong></p>
+<p>Protocols are agreed rules for sending bytes between chips: UART is a simple two-wire serial link, I2C connects many devices on two shared wires, and SPI is a fast four-wire link.</p></aside>
+<h2 id="17-1-serial-vs-parallel-sync-vs-async">17.1 Serial vs parallel, sync vs async</h2>
+<ul>
+<li>Serial: bits are sent one after another on a single wire. Fewer wires, so it is used almost everywhere.</li>
+<li>Asynchronous (UART): no shared clock wire; both sides agree on the speed (baud rate) in advance.</li>
+<li>Synchronous (I2C, SPI): a clock wire tells the receiver exactly when to read each bit.</li>
+</ul>
+<h2 id="17-2-uart">17.2 UART</h2>
+<p>UART (Universal Asynchronous Receiver Transmitter) connects exactly two devices. It is what the Serial Monitor, GPS modules, Bluetooth modules (HC-05) and many sensors use.</p>
+<div class="tablewrap"><table>
+<tr><th><strong>Wire</strong></th><th><strong>Connection</strong></th></tr>
+<tr><td>TX</td><td>Transmit of device A goes to RX of device B</td></tr>
+<tr><td>RX</td><td>Receive of device A comes from TX of device B (so TX and RX are crossed)</td></tr>
+<tr><td>GND</td><td>Common ground is mandatory</td></tr>
+</table></div>
+<p>Frame format 8N1 (the most common): when idle the line is HIGH. One byte is sent as: 1 start bit (LOW), 8 data bits (least significant bit first), no parity, 1 stop bit (HIGH). That is 10 bits for 8 bits of data.</p>
+<ul>
+<li>Baud rate = bits per second. Common: 9600, 115200.</li>
+<li>Time for one byte at 9600 baud = 10 / 9600 = about 1.04 ms. So 9600 baud moves roughly 960 bytes per second.</li>
+<li>Both devices must use the same baud rate and format, otherwise you see garbage characters.</li>
+<li>Voltage levels must match: do not connect 5 V TX to a 3.3 V RX without a level shifter or divider.</li>
+</ul>
+<pre class="code"><code>void setup() {
+    Serial.begin(115200);                  // must match the Serial Monitor
+}
+ 
+void loop() {
+    if (Serial.available() &gt; 0) {          // a byte has arrived
+        char c = Serial.read();
+        Serial.print("Got: ");
+        Serial.println(c);
+    }
+}</code></pre>
+<p>Receiving commands properly: build a line in a buffer until you see a newline, then parse it. Check buffer length so a long message cannot overflow it.</p>
+<pre class="code"><code>char line[32];
+uint8_t len = 0;
+ 
+void loop() {
+    while (Serial.available() &gt; 0) {
+        char c = Serial.read();
+        if (c == '\n') {
+            line[len] = '\0';
+            handle_command(line);          // e.g. compare with strcmp
+            len = 0;
+        } else if (len &lt; sizeof(line) - 1) {
+            line[len++] = c;               // protect against overflow
+        }
+    }
+}</code></pre>
+<h2 id="17-3-i2c">17.3 I2C</h2>
+<p>I2C (Inter-Integrated Circuit, "I squared C") uses just two shared wires for many devices: SDA (data) and SCL (clock). One master (your microcontroller) talks to several slaves (sensors, displays, EEPROM). Each slave has a 7-bit address.</p>
+<aside class="callout info" style="--c:#2A7F8E"><p><strong>Analogy: a classroom</strong></p>
+<p>The teacher (master) calls a student by name (the address) and asks a question. Only the student whose name was called answers. Everyone shares the same room (the two wires).</p></aside>
+<ul>
+<li>Both lines are open-drain, so each needs a pull-up resistor to the supply (typically 4.7 kohm; 2.2 to 10 kohm is the usual range). Many breakout boards already have them.</li>
+<li>Speeds: 100 kHz standard, 400 kHz fast mode.</li>
+<li>A transaction: START, 7-bit address plus read/write bit, ACK from the slave, data bytes each with an ACK, STOP.</li>
+<li>Default pins: Uno SDA = A4, SCL = A5. ESP32 SDA = GPIO 21, SCL = GPIO 22. ESP8266 NodeMCU SDA = D2 (GPIO 4), SCL = D1 (GPIO 5).</li>
+<li>Two devices with the same address cannot share a bus without a multiplexer or an address pin.</li>
+</ul>
+<pre class="code"><code>// I2C scanner: finds the addresses of all connected devices
+#include &lt;Wire.h&gt;
+ 
+void setup() {
+    Serial.begin(115200);
+    Wire.begin();
+    for (uint8_t addr = 1; addr &lt; 127; addr++) {
+        Wire.beginTransmission(addr);
+        if (Wire.endTransmission() == 0) {           // 0 = device answered (ACK)
+            Serial.print("Found device at 0x");
+            Serial.println(addr, HEX);
+        }
+    }
+}
+ 
+void loop() {}</code></pre>
+<pre class="code"><code>// Read two bytes from a sensor register (generic pattern)
+Wire.beginTransmission(0x48);       // device address
+Wire.write(0x00);                   // register to read
+Wire.endTransmission();
+ 
+Wire.requestFrom(0x48, 2);          // ask for 2 bytes
+if (Wire.available() &gt;= 2) {
+    uint8_t hi = Wire.read();
+    uint8_t lo = Wire.read();
+    int16_t raw = (hi &lt;&lt; 8) | lo;   // combine: byte order from the datasheet
+}</code></pre>
+<p>Typical I2C devices: OLED SSD1306 (0x3C), MPU6050 (0x68), BMP280 (0x76 or 0x77), RTC DS3231 (0x68), LCD backpack (0x27 or 0x3F). A common error: SDA and SCL swapped or missing pull-ups, so the scanner finds nothing.</p>
+<h2 id="17-4-spi">17.4 SPI</h2>
+<p>SPI (Serial Peripheral Interface) is fast and simple: one master and one or more slaves. Data goes in both directions at the same time (full duplex).</p>
+<div class="tablewrap"><table>
+<tr><th><strong>Wire</strong></th><th><strong>Meaning</strong></th></tr>
+<tr><td>SCK</td><td>Clock from the master</td></tr>
+<tr><td>MOSI</td><td>Master Out, Slave In: data from master to slave</td></tr>
+<tr><td>MISO</td><td>Master In, Slave Out: data from slave to master</td></tr>
+<tr><td>CS (SS)</td><td>Chip Select, one per slave; pull LOW to talk to that slave</td></tr>
+</table></div>
+<ul>
+<li>Speeds from 1 MHz to tens of MHz, much faster than I2C. Used for SD cards, displays (TFT), flash memory, ADCs and radio modules (NRF24, LoRa).</li>
+<li>Every bit sent by the master shifts one bit in from the slave at the same time. To read, the master sends dummy bytes.</li>
+<li>Four modes (0 to 3) set the clock idle level (CPOL) and which edge samples data (CPHA). Master and slave must use the same mode; check the datasheet.</li>
+<li>Each extra slave needs one more CS pin, so SPI uses more wires than I2C.</li>
+</ul>
+<pre class="code"><code>#include &lt;SPI.h&gt;
+ 
+const int CS_PIN = 5;
+ 
+void setup() {
+    pinMode(CS_PIN, OUTPUT);
+    digitalWrite(CS_PIN, HIGH);          // idle: slave not selected
+    SPI.begin();
+}
+ 
+uint8_t spiReadRegister(uint8_t reg) {
+    SPI.beginTransaction(SPISettings(1000000, MSBFIRST, SPI_MODE0));
+    digitalWrite(CS_PIN, LOW);           // select the slave
+    SPI.transfer(reg | 0x80);            // send register address (read flag is device specific)
+    uint8_t value = SPI.transfer(0x00);  // send dummy byte, get the answer
+    digitalWrite(CS_PIN, HIGH);          // release the slave
+    SPI.endTransaction();
+    return value;
+}</code></pre>
+<h2 id="17-5-comparison">17.5 Comparison</h2>
+<div class="tablewrap"><table>
+<tr><th></th><th><strong>UART</strong></th><th><strong>I2C</strong></th><th><strong>SPI</strong></th></tr>
+<tr><td>Wires</td><td>2 (TX, RX) + GND</td><td>2 shared (SDA, SCL)</td><td>3 + one CS per slave</td></tr>
+<tr><td>Devices</td><td>2</td><td>Many (addresses)</td><td>Many (CS lines)</td></tr>
+<tr><td>Clock</td><td>None (baud rate)</td><td>Master clock</td><td>Master clock</td></tr>
+<tr><td>Speed</td><td>Up to about 1 Mbps</td><td>100 kHz to 400 kHz (up to MHz)</td><td>10 MHz and more</td></tr>
+<tr><td>Direction</td><td>Full duplex</td><td>Half duplex</td><td>Full duplex</td></tr>
+<tr><td>Best for</td><td>PC link, GPS, modules</td><td>Sensors, small displays, RTC</td><td>SD card, fast displays, flash</td></tr>
+</table></div>
+<p>Quick rule: need to talk to a PC or a module with a serial port, use UART; many slow sensors on few pins, use I2C; high data rate, use SPI.</p>
+<h2 id="17-6-multi-byte-values-and-byte-order">17.6 Multi-byte values and byte order</h2>
+<p>A 16-bit sensor value arrives as two bytes. The datasheet says which byte comes first. Combine as (high &lt;&lt; 8) | low if the high byte arrives first. Mixing this up is a very common bug (see endianness in Topic 12).</p>
+<h2 id="common-mistakes-17">Common mistakes</h2>
+<div class="tablewrap"><table>
+<tr><th><strong>Mistake</strong></th><th><strong>Fix</strong></th></tr>
+<tr><td>Wrong baud rate or format</td><td>Match both devices (for example 115200 8N1)</td></tr>
+<tr><td>TX connected to TX instead of RX</td><td>Cross the lines: TX to RX, RX to TX</td></tr>
+<tr><td>No common ground between the devices</td><td>Always connect GND</td></tr>
+<tr><td>I2C without pull-up resistors</td><td>Add 4.7 kohm to the supply on SDA and SCL</td></tr>
+<tr><td>Two I2C devices with the same address</td><td>Change the address pin or use a multiplexer</td></tr>
+<tr><td>SPI mode or bit order mismatch</td><td>Read the datasheet; set CPOL, CPHA and MSB or LSB first</td></tr>
+<tr><td>Mixing 5 V and 3.3 V logic</td><td>Use level shifters</td></tr>
+</table></div>
+<h2 id="practice-programs-type-each-one-yourself-17">Practice programs (type each one yourself)</h2>
+<ol>
+<li>Send a message from the ESP32 to the PC and echo characters typed in the Serial Monitor.</li>
+<li>Write a command parser: "LED ON" and "LED OFF" received over UART control an LED.</li>
+<li>Connect two boards by UART and send a sensor reading from one to the other.</li>
+<li>Run the I2C scanner with an OLED or a sensor and note the address.</li>
+<li>Read a temperature/humidity or pressure sensor over I2C and print the values.</li>
+<li>Read a value from an SPI device (for example an SD card module or a sensor) and print it.</li>
+<li>Write a function that combines two received bytes into an int16_t and test with known values.</li>
+</ol>
+<h2 id="interview-questions-with-short-answers-17">Interview questions with short answers</h2>
+<p><strong>Q1. What is baud rate? The number of symbols (bits) sent per second on a serial line.</strong></p>
+<p><strong>Q2. What does 8N1 mean? 8 data bits, no parity, 1 stop bit.</strong></p>
+<p><strong>Q3. Why does I2C need pull-up resistors? The lines are open-drain, so devices can only pull them low; resistors pull them high.</strong></p>
+<p><strong>Q4. How many devices can an I2C bus have? Up to 112 usable 7-bit addresses in theory, fewer in practice because of capacitance and address clashes.</strong></p>
+<p><strong>Q5. What are MOSI, MISO, SCK and CS? Master out slave in, master in slave out, clock, and chip select.</strong></p>
+<p><strong>Q6. I2C vs SPI? I2C uses two wires and addresses but is slower; SPI is faster and full duplex but needs more pins.</strong></p>
+<p><strong>Q7. Why is the ground connection important? Signals are voltages relative to ground; without a common ground the receiver has no reference.</strong></p>
+<p><strong>TOPIC 18</strong></p>
+<h1 id="embedded-design-patterns-buffers-state-machines-watchdog-sle">Embedded Design Patterns: Buffers, State Machines, Watchdog, Sleep and RTOS</h1>
+<aside class="callout info" style="--c:#2A7F8E"><p><strong>In one line</strong></p>
+<p>These are the reusable building blocks of real firmware: a ring buffer to pass data safely, a state machine to organise behaviour, a watchdog to recover from hangs, sleep modes to save power and an RTOS to run several tasks.</p></aside>
+<h2 id="18-1-circular-ring-buffer">18.1 Circular (ring) buffer</h2>
+<p>A fixed-size buffer that wraps around. New data is written at the head; old data is read from the tail. Both indexes wrap to 0 when they reach the end. It is used for UART receive data, sensor samples and logging.</p>
+<aside class="callout info" style="--c:#2A7F8E"><p><strong>Analogy: a circular conveyor belt</strong></p>
+<p>One person puts items on the belt (head), another takes them off (tail). The belt never ends, it loops. If the putter is faster than the taker for too long, the belt fills up (overflow).</p></aside>
+<pre class="code"><code>#include &lt;stdint.h&gt;
+#include &lt;stdbool.h&gt;
+ 
+#define BUF_SIZE 8                   // use a power of 2 so we can wrap with a mask
+ 
+typedef struct {
+    uint8_t data[BUF_SIZE];
+    volatile uint8_t head;           // written by the producer (ISR)
+    volatile uint8_t tail;           // written by the consumer (main)
+} RingBuffer;
+ 
+bool rb_is_empty(const RingBuffer *rb) { return rb-&gt;head == rb-&gt;tail; }
+bool rb_is_full (const RingBuffer *rb) {
+    return ((rb-&gt;head + 1) &amp; (BUF_SIZE - 1)) == rb-&gt;tail;   // one slot stays empty
+}
+ 
+bool rb_put(RingBuffer *rb, uint8_t byte) {
+    if (rb_is_full(rb)) return false;                    // overflow: report it
+    rb-&gt;data[rb-&gt;head] = byte;
+    rb-&gt;head = (rb-&gt;head + 1) &amp; (BUF_SIZE - 1);          // wrap: same as % 8
+    return true;
+}
+ 
+bool rb_get(RingBuffer *rb, uint8_t *byte) {
+    if (rb_is_empty(rb)) return false;
+    *byte = rb-&gt;data[rb-&gt;tail];
+    rb-&gt;tail = (rb-&gt;tail + 1) &amp; (BUF_SIZE - 1);
+    return true;
+}</code></pre>
+<ul>
+<li>Empty: head == tail. Full: advancing head would hit tail. Keeping one slot unused avoids confusing empty with full.</li>
+<li>With one producer (ISR) and one consumer (main), each writes only its own index, so no lock is needed on a single-core chip as long as index updates are atomic (8-bit on AVR, 32-bit on ARM).</li>
+<li>Size a power of two so the wrap is a fast AND mask instead of a slow divide.</li>
+<li>Always decide what to do on overflow: drop new data, drop old data, or raise an error flag.</li>
+</ul>
+<p>Typical use: the UART receive ISR calls rb_put for each byte; loop() calls rb_get and processes whatever has arrived.</p>
+<h2 id="18-2-finite-state-machine-fsm">18.2 Finite state machine (FSM)</h2>
+<p>Many devices behave differently depending on what they are doing: waiting, running, error. A state machine keeps a variable for the current state and decides what to do next from the state and the event. It replaces tangled if-else flags with clear, testable logic.</p>
+<div class="tablewrap"><table>
+<tr><th><strong>Current state</strong></th><th><strong>Event</strong></th><th><strong>Action</strong></th><th><strong>Next state</strong></th></tr>
+<tr><td>RED</td><td>Timer (10 s)</td><td>Turn red off, green on</td><td>GREEN</td></tr>
+<tr><td>GREEN</td><td>Timer (10 s)</td><td>Turn green off, yellow on</td><td>YELLOW</td></tr>
+<tr><td>YELLOW</td><td>Timer (3 s)</td><td>Turn yellow off, red on</td><td>RED</td></tr>
+</table></div>
+<pre class="code"><code>typedef enum { STATE_RED, STATE_GREEN, STATE_YELLOW } State;
+ 
+State state = STATE_RED;
+unsigned long stateStart = 0;
+ 
+void setLights(bool r, bool y, bool g) {
+    digitalWrite(RED_PIN, r);  digitalWrite(YELLOW_PIN, y);  digitalWrite(GREEN_PIN, g);
+}
+ 
+void loop() {
+    unsigned long now = millis();
+ 
+    switch (state) {
+        case STATE_RED:
+            setLights(1, 0, 0);
+            if (now - stateStart &gt;= 10000) { state = STATE_GREEN;  stateStart = now; }
+            break;
+        case STATE_GREEN:
+            setLights(0, 0, 1);
+            if (now - stateStart &gt;= 10000) { state = STATE_YELLOW; stateStart = now; }
+            break;
+        case STATE_YELLOW:
+            setLights(0, 1, 0);
+            if (now - stateStart &gt;= 3000)  { state = STATE_RED;    stateStart = now; }
+            break;
+    }
+}</code></pre>
+<ul>
+<li>Draw the state diagram first (circles for states, arrows for events). Code follows the drawing.</li>
+<li>The program never blocks: every pass of loop() checks the event and moves on, so it can serve other tasks too.</li>
+<li>Add an ERROR state and make sure every state handles unexpected events.</li>
+<li>Bigger machines use a table of function pointers, one per state (Topic 13).</li>
+</ul>
+<p>You already built a traffic signal project; rebuilding it as an explicit state machine is a very good interview story.</p>
+<h2 id="18-3-watchdog-timer">18.3 Watchdog timer</h2>
+<p>A watchdog is a hardware timer that resets the chip if your software does not "kick" (reset) it within a set time. If the code hangs in an infinite loop or crashes, the watchdog restarts the device automatically.</p>
+<aside class="callout info" style="--c:#2A7F8E"><p><strong>Analogy: a dead-man's switch</strong></p>
+<p>A train driver must press a pedal every few seconds. If the driver stops pressing, the train brakes automatically. The watchdog is the pedal; the reset is the brake.</p></aside>
+<pre class="code"><code>// Arduino Uno (AVR)
+#include &lt;avr/wdt.h&gt;
+ 
+void setup() {
+    wdt_enable(WDTO_2S);        // reset if not kicked within 2 seconds
+}
+ 
+void loop() {
+    do_work();
+    wdt_reset();                // kick the watchdog: "I am still alive"
+}</code></pre>
+<ul>
+<li>Kick the watchdog only when the whole system is healthy, at one place in the main loop. Kicking it from a timer ISR defeats its purpose, because the ISR keeps running even if main is stuck.</li>
+<li>Choose a timeout longer than your slowest legitimate loop.</li>
+<li>After a reset, check the reset reason and log it so you know the watchdog fired.</li>
+<li>ESP32 has task watchdogs under FreeRTOS: a task that runs too long without yielding triggers a reset message. Add small delays or yield in long loops.</li>
+<li>Safety-related products require a watchdog.</li>
+</ul>
+<h2 id="18-4-low-power-and-sleep-modes">18.4 Low-power and sleep modes</h2>
+<p>Battery products spend most of their time asleep. A CPU running at full speed may draw tens of milliamps; deep sleep can be microamps.</p>
+<div class="tablewrap"><table>
+<tr><th><strong>Mode</strong></th><th><strong>What happens</strong></th><th><strong>Wake-up sources</strong></th></tr>
+<tr><td>Active</td><td>Everything runs</td><td>-</td></tr>
+<tr><td>Light / idle sleep</td><td>CPU stops, peripherals and RAM stay on; quick wake</td><td>Timer, UART, GPIO interrupts</td></tr>
+<tr><td>Deep sleep</td><td>Almost everything off; RAM often lost; slow wake</td><td>RTC timer, special pins, touch</td></tr>
+</table></div>
+<pre class="code"><code>// ESP32: sleep 10 seconds, wake, read the sensor, sleep again
+void setup() {
+    Serial.begin(115200);
+    read_and_send_sensor();                       // do the work quickly
+ 
+    esp_sleep_enable_timer_wakeup(10ULL * 1000000ULL);   // time in microseconds
+    esp_deep_sleep_start();                       // the chip restarts at setup() on wake
+}
+ 
+void loop() {}                                    // never reached</code></pre>
+<ul>
+<li>Waking from deep sleep runs setup() again; variables in normal RAM are lost. Keep important values in RTC memory (RTC_DATA_ATTR) if needed.</li>
+<li>The sleep strategy matters more than the sleep function: wake, measure, transmit, sleep. Turn off Wi-Fi and unused peripherals.</li>
+<li>Average current = (active current x active time + sleep current x sleep time) / total time. Short active bursts give very long battery life.</li>
+</ul>
+<h2 id="18-5-introduction-to-an-rtos">18.5 Introduction to an RTOS</h2>
+<p>A Real-Time Operating System lets you write several independent tasks (read sensor, update display, handle Wi-Fi) that appear to run at the same time. A scheduler switches between them. The ESP32 Arduino core already runs on FreeRTOS, and your loop() is one task.</p>
+<div class="tablewrap"><table>
+<tr><th><strong>Term</strong></th><th><strong>Meaning</strong></th></tr>
+<tr><td>Task</td><td>An independent function with its own stack and priority</td></tr>
+<tr><td>Scheduler</td><td>Decides which task runs, usually the highest priority one that is ready</td></tr>
+<tr><td>Delay</td><td>vTaskDelay lets other tasks run while this one waits (unlike delay-busy waiting)</td></tr>
+<tr><td>Queue</td><td>Thread-safe way to pass data between tasks or from an ISR to a task</td></tr>
+<tr><td>Semaphore / Mutex</td><td>Signals an event or protects a shared resource from two tasks at once</td></tr>
+</table></div>
+<pre class="code"><code>// ESP32 (Arduino core): two tasks
+void blinkTask(void *param) {
+    pinMode(2, OUTPUT);
+    while (true) {
+        digitalWrite(2, !digitalRead(2));
+        vTaskDelay(500 / portTICK_PERIOD_MS);       // sleep 500 ms, others run
+    }
+}
+ 
+void sensorTask(void *param) {
+    while (true) {
+        int v = analogRead(34);
+        Serial.println(v);
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
+    }
+}
+ 
+void setup() {
+    Serial.begin(115200);
+    xTaskCreate(blinkTask,  "blink",  2048, NULL, 1, NULL);   // name, stack bytes, param, priority, handle
+    xTaskCreate(sensorTask, "sensor", 4096, NULL, 1, NULL);
+}
+ 
+void loop() {}</code></pre>
+<ul>
+<li>Use an RTOS when you have several activities with different timing. Use a simple super-loop with a state machine when the program is small.</li>
+<li>Shared data between tasks needs a mutex or a queue, otherwise you get race conditions just like with interrupts.</li>
+<li>Each task needs enough stack; too little causes crashes (check with uxTaskGetStackHighWaterMark).</li>
+</ul>
+<h2 id="common-mistakes-18">Common mistakes</h2>
+<div class="tablewrap"><table>
+<tr><th><strong>Mistake</strong></th><th><strong>Fix</strong></th></tr>
+<tr><td>Ring buffer size not a power of 2 but using a mask</td><td>Use % or choose 8, 16, 32, 64...</td></tr>
+<tr><td>Not handling ring buffer overflow</td><td>Return false, count dropped bytes, or enlarge the buffer</td></tr>
+<tr><td>Kicking the watchdog inside a timer interrupt</td><td>Kick it from main code after checking system health</td></tr>
+<tr><td>Using delay() inside a state machine</td><td>Use millis comparisons so the machine never blocks</td></tr>
+<tr><td>Forgetting that deep sleep restarts the program</td><td>Do everything in setup() and store state in RTC memory</td></tr>
+<tr><td>Sharing variables between RTOS tasks without protection</td><td>Use a queue or mutex</td></tr>
+</table></div>
+<h2 id="practice-programs-type-each-one-yourself-18">Practice programs (type each one yourself)</h2>
+<ol>
+<li>Implement the ring buffer on a PC with a test that puts 20 bytes into a size-8 buffer and checks the overflow handling.</li>
+<li>Use the ring buffer for UART receive: the ISR or serial event puts bytes, loop() prints them.</li>
+<li>Rebuild your traffic light project as an explicit state machine with a pedestrian-button event.</li>
+<li>Add a watchdog to a program, then deliberately hang it with while(1) and watch it reset.</li>
+<li>Build a battery-friendly logger: wake every 30 seconds, read a sensor, print it, sleep again.</li>
+<li>Create two FreeRTOS tasks on the ESP32 that blink two LEDs at different speeds.</li>
+</ol>
+<h2 id="interview-questions-with-short-answers-18">Interview questions with short answers</h2>
+<p><strong>Q1. What is a circular buffer and where is it used? A fixed-size FIFO that wraps around; used for UART data, sensor streams and logs.</strong></p>
+<p><strong>Q2. How do you tell a full buffer from an empty one? Empty when head equals tail; full when head + 1 equals tail (one slot kept free), or use a count variable.</strong></p>
+<p><strong>Q3. What is a finite state machine? A model with a finite set of states and rules that move between them when events occur.</strong></p>
+<p><strong>Q4. What is a watchdog timer? A hardware timer that resets the system if the software fails to reset it in time.</strong></p>
+<p><strong>Q5. Why should you not kick the watchdog from an ISR? The ISR can keep running while main is stuck, hiding the hang.</strong></p>
+<p><strong>Q6. What is the difference between light sleep and deep sleep? Light sleep stops the CPU but keeps RAM and quick wake; deep sleep powers down almost everything for the lowest current but restarts the program.</strong></p>
+<p><strong>Q7. Super-loop vs RTOS? A super-loop is one endless loop (simple); an RTOS schedules several tasks with priorities and timing guarantees.</strong></p>
+<p><strong>Q8. What is a mutex? A lock that lets only one task use a shared resource at a time.</strong></p>
+<h1 id="final-checklist">Final checklist</h1>
+<p>Tick a box only when you have actually done it, not when you have only read it.</p>
+<div class="tablewrap"><table>
+<tr><th><strong>No.</strong></th><th><strong>Topic</strong></th><th><strong>I can explain it</strong></th><th><strong>I wrote the code</strong></th><th><strong>I can answer Qs</strong></th></tr>
+<tr><td>1</td><td>Basics and Data Types</td><td>☐</td><td>☐</td><td>☐</td></tr>
+<tr><td>2</td><td>Operators and Control Flow</td><td>☐</td><td>☐</td><td>☐</td></tr>
+<tr><td>3</td><td>Functions and Recursion</td><td>☐</td><td>☐</td><td>☐</td></tr>
+<tr><td>4</td><td>Arrays and Strings</td><td>☐</td><td>☐</td><td>☐</td></tr>
+<tr><td>5</td><td>Pointers</td><td>☐</td><td>☐</td><td>☐</td></tr>
+<tr><td>6</td><td>Structures, Unions, Enums and typedef</td><td>☐</td><td>☐</td><td>☐</td></tr>
+<tr><td>7</td><td>Dynamic Memory Allocation</td><td>☐</td><td>☐</td><td>☐</td></tr>
+<tr><td>8</td><td>Storage Classes and the Preprocessor</td><td>☐</td><td>☐</td><td>☐</td></tr>
+<tr><td>9</td><td>File Handling</td><td>☐</td><td>☐</td><td>☐</td></tr>
+<tr><td>10</td><td>Bitwise Operators and Bit Manipulation</td><td>☐</td><td>☐</td><td>☐</td></tr>
+<tr><td>11</td><td>Type Qualifiers and Fixed-Width Types</td><td>☐</td><td>☐</td><td>☐</td></tr>
+<tr><td>12</td><td>Memory Layout, Startup Code, Padding and Endianness</td><td>☐</td><td>☐</td><td>☐</td></tr>
+<tr><td>13</td><td>Registers, Memory-Mapped I/O and Function Pointers</td><td>☐</td><td>☐</td><td>☐</td></tr>
+<tr><td>14</td><td>GPIO and Debouncing</td><td>☐</td><td>☐</td><td>☐</td></tr>
+<tr><td>15</td><td>Interrupts and ISR</td><td>☐</td><td>☐</td><td>☐</td></tr>
+<tr><td>16</td><td>Timers, PWM and ADC</td><td>☐</td><td>☐</td><td>☐</td></tr>
+<tr><td>17</td><td>Communication Protocols: UART, I2C and SPI</td><td>☐</td><td>☐</td><td>☐</td></tr>
+<tr><td>18</td><td>Embedded Design Patterns</td><td>☐</td><td>☐</td><td>☐</td></tr>
+</table></div>
+<h2 id="the-10-most-asked-topics-interview-priority">The 10 most asked topics (interview priority)</h2>
+<ol>
+<li>Pointers (all of Topic 5), especially pointer arithmetic, dangling pointers, function pointers.</li>
+<li>Bit manipulation: set, clear, toggle, check, power of 2, count bits.</li>
+<li>volatile and where it is needed.</li>
+<li>const, static and their effect on memory and linkage.</li>
+<li>Memory layout: .text, .data, .bss, stack, heap, and what runs before main().</li>
+<li>Interrupts: ISR rules, latency, shared variables, race conditions.</li>
+<li>UART, I2C and SPI: differences, wiring, speed.</li>
+<li>Structure padding, unions and endianness.</li>
+<li>Dynamic memory problems: leaks, dangling pointers and why embedded avoids malloc.</li>
+<li>Your own projects: be able to explain each one in two minutes, including the bug that taught you the most.</li>
+</ol>
+<aside class="callout info" style="--c:#2A7F8E"><p><strong>Final advice</strong></p>
+<p>Do not try to memorise this guide. Understand each idea, then prove it by writing a short program. A candidate who can write a clean bit-manipulation function and explain volatile in plain words beats one who recites definitions.</p>
+<p>Link every topic to something you built: debouncing in your door lock, ADC in your soil sensor, I2C in your OLED projects, interrupts in your traffic signal. Interviewers love real examples.</p></aside>
